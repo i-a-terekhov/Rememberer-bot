@@ -14,39 +14,44 @@ class ListOfTasks:
         else:
             return True
 
+    def add_task(self, describe: str):
+        self.list_of_tasks.append(describe)
 
-class Categories:
-    def __init__(self):
-        self.list_of_categories = [
+
+class RoomsTasks:
+    default_list_of_tasks = [
             'Не забыть сделать',
             'Не забыть купить',
             'Не забыть посетить',
             'Обновить пароли на сервисы'
         ]
 
+    def __init__(self):
+        self.list_of_tasks = self.default_list_of_tasks
+
     def add_new_category(self, new_category: str) -> bool:
-        if new_category in self.list_of_categories:
+        if new_category in self.list_of_tasks:
             print('такая категория уже существует')
             return False
         else:
-            self.list_of_categories.append(new_category)
+            self.list_of_tasks.append(new_category)
             return True
 
     def del_category(self, category: str) -> None:
-        self.list_of_categories.remove(category)
+        self.list_of_tasks.remove(category)
 
     def return_to_default(self) -> None:
-        Categories.__init__(self)
+        self.__init__()
 
 
 class Task:
-    def __init__(self, text, category, reminder_time):
-        self.text = text
-        self.category = category
+    def __init__(self, room, text, category, reminder_time):
+        self.room = room  # уник. имя комнаты - ключ в словаре, значения для которого - лист с ID участников комнаты
+        self.text = text  # текст задачи - ключ в словаре, значения для которого - подзадачи
         self.reminder_time = reminder_time
 
     def __str__(self):
-        return f"Task: {self.text}, Category: {self.category}, Reminder Time: {self.reminder_time}"
+        return f"Task: {self.text}, Text: {self.text}, Reminder Time: {self.reminder_time}"
 
 
 class Group:

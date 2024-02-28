@@ -8,37 +8,35 @@ from hidden.tokenfile import TOKEN_FIVE as TOKEN
 from hidden.tokenfile import OWNER_CHAT_ID as CHAT_ID
 
 from handlers.echo_plug import service_router, regular_router
-from classes.schedule import ListOfTasks
+from schedule.main_objects import ListOfTasks
 
 
 bot_unit = Bot(TOKEN)
-tasks = ListOfTasks
+tasks = ListOfTasks()
 
+
+#TODO произвести рефактор: все функции работы с расписанием перенести в отдельный модуль. Для работы со всеми
+# объектами и функциями расписания вывести одну функцию
 
 # Для проверки работы periodic_start_for_functions
-async def send_message_for_check():
+async def send_message_for_check(text: str):
     print('send_message_for_check')
-    await bot_unit.send_message(chat_id=CHAT_ID, text="Привет, это ваше регулярное сообщение!")
-
-
-async def send_message(text: str):
-    print('send_message')
     await bot_unit.send_message(chat_id=CHAT_ID, text=text)
 
 
-#TODO разобраться, что тут не так
 async def check_list_of_tasks():
     if tasks.check_empty():
         text = 'Есть некоторые задачи'
     else:
         text = 'Нет задач'
-    await send_message(text=text)
+        tasks.add_task('Первая задача!')
+    await send_message_for_check(text=text)
 
 
 async def periodic_start_for_functions():
     print('periodic_start_for_functions')
     while True:
-        await send_message_for_check()
+        await check_list_of_tasks()
         await asyncio.sleep(60 * 5)
 
 
