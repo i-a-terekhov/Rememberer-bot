@@ -8,6 +8,7 @@ from hidden.tokenfile import TOKEN_FIVE as TOKEN
 from hidden.tokenfile import OWNER_CHAT_ID as CHAT_ID
 
 from handlers.echo_plug import service_router, regular_router
+from handlers.start_dialogue import start_router
 from schedule.main_objects import periodic_start_for_functions
 
 
@@ -29,8 +30,9 @@ async def main(bot: Bot):
     )
 
     dp.include_routers(
-        service_router,
-        regular_router,
+        start_router,
+        # service_router,
+        # regular_router,
         )
 
     await dp.start_polling(bot)
