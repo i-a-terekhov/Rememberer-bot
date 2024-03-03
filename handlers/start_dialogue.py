@@ -6,7 +6,7 @@ from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery, InputFile
 from database import kvazi_db
 from hidden.tokenfile import OWNER_CHAT_ID, TOKEN
 from keyboards.inline import make_inline_rows_keyboard
-from states.classes import Entering
+from states.base import Entering
 
 
 bot = Bot(TOKEN)
@@ -43,8 +43,6 @@ async def ask_for_rooms_name(callback: CallbackQuery, state: FSMContext) -> None
 
     # Задаем стейт ожидания имени комнаты
     await state.set_state(Entering.waiting_for_rooms_name)
-    #TODO при стейте waiting_for_rooms_name и вводе несуществующей комнаты, необходимо выводить
-    # кнопки "попробовать еще", "создать комнату с этим именем", "создать комнату с другим именем"
 
     await callback.message.answer(
         text="Введите название комнаты (регистр имеет значение!)",
@@ -59,7 +57,35 @@ async def check_rooms_name(message: Message, state: FSMContext) -> None:
 
     print(f'Юзер {message.chat.id}: check_rooms_name')
 
-    if message.text in kvazi_db.rooms_name:
-        print('Комната существует, надо запросить пароль')
+    if message.text in kvazi_db.rooms_name.keys():
+        print(f'Комната "{message.text}" существует, запрошен пароль')
+        await state.set_state(Entering.waiting_for_rooms_password)
+        await message.answer(text=f'Введите пароль для комнаты {message.text}')
     else:
+        # В этом варианте стейт не меняется:
         print(f'Комната не найдена, можно создать с введенным именем "{message.text}" или использовать другое имя')
+
+        #TODO необходимо передавать message.text в дальнейшие обработчики
+        await message.answer(
+            text="Комнаты с таким именем не существует! Вы можете ввести имя комнаты заново (просто напишите в чат).\n"
+                 "Либо Вы можете создать комнату с введенным именем (кнопка).\n"
+                 "Либо Вы можете создать комнату с другим именем (кнопка).",
+            reply_markup=make_inline_rows_keyboard(['Использовать текущее имя для комнаты', 'Выбрать другое имя'])
+        )
+
+
+@start_router.callback_query(F.data.in_(["Использовать текущее имя для комнаты"]))
+async def make_room_with_current_name(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Хэндлер обработки кнопки "Использовать текущее имя для комнаты",
+    меняет состояние на "Ожидает ввод пароля для комнаты"
+    """
+
+    await callback.answer()
+    print(f'Юзер {callback.from_user.id}: нажал на кнопку "Использовать текущее имя для комнаты"')
+
+    await callback.message.answer(
+        text="Отлично! Теперь задайте пароль для комнаты!",
+    )
+    await state.set_state(Entering.waiting_for_rooms_password)
+
