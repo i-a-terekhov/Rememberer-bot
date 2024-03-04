@@ -59,22 +59,23 @@ async def check_rooms_name(message: Message, state: FSMContext) -> None:
 
     if message.text in kvazi_db.rooms_name.keys():
         print(f'Комната "{message.text}" существует, запрошен пароль')
-        await state.set_state(Entering.waiting_for_rooms_password)
+        await state.set_state(Entering.waiting_for_new_rooms_password)
         await message.answer(text=f'Введите пароль для комнаты {message.text}')
     else:
-        # В этом варианте стейт не меняется:
+        # В этом варианте стейт не меняется, но сохраняем введенное пользователем имя комнаты, на случай,
+        # если пользователь захочет использовать это имя на следующем шаге
+        await state.update_data(new_room_name=message.text)
         print(f'Комната не найдена, можно создать с введенным именем "{message.text}" или использовать другое имя')
 
-        #TODO необходимо передавать message.text в дальнейшие обработчики
         await message.answer(
             text="Комнаты с таким именем не существует! Вы можете ввести имя комнаты заново (просто напишите в чат).\n"
                  "Либо Вы можете создать комнату с введенным именем (кнопка).\n"
                  "Либо Вы можете создать комнату с другим именем (кнопка).",
-            reply_markup=make_inline_rows_keyboard(['Использовать текущее имя для комнаты', 'Выбрать другое имя'])
+            reply_markup=make_inline_rows_keyboard(['Использовать текущее имя', 'Выбрать другое имя'])
         )
 
 
-@start_router.callback_query(F.data.in_(["Использовать текущее имя для комнаты"]))
+@start_router.callback_query(F.data.in_(["Использовать текущее имя"]))
 async def make_room_with_current_name(callback: CallbackQuery, state: FSMContext) -> None:
     """
     Хэндлер обработки кнопки "Использовать текущее имя для комнаты",
@@ -84,8 +85,10 @@ async def make_room_with_current_name(callback: CallbackQuery, state: FSMContext
     await callback.answer()
     print(f'Юзер {callback.from_user.id}: нажал на кнопку "Использовать текущее имя для комнаты"')
 
+    user_data = await state.get_data()
+    room_name = user_data.get("new_room_name")
     await callback.message.answer(
-        text="Отлично! Теперь задайте пароль для комнаты!",
+        text=f'Отлично! Теперь задайте пароль \nдля комнаты "{room_name}"!',
     )
-    await state.set_state(Entering.waiting_for_rooms_password)
+    await state.set_state(Entering.waiting_for_new_rooms_password)
 
