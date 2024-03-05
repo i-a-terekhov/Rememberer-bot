@@ -92,3 +92,22 @@ async def make_room_with_current_name(callback: CallbackQuery, state: FSMContext
     )
     await state.set_state(Entering.waiting_for_new_rooms_password)
 
+
+@start_router.message(StateFilter(Entering.waiting_for_new_rooms_password))
+async def accept_the_password(message: Message, state: FSMContext) -> None:
+    """
+    Хэндлер ловит пароль новой для комнаты, имя которой передается в state, сохраняя полученную пару в kvazi_db
+    """
+    print(f'Юзер {message.chat.id}: accept_the_password')
+
+    password = message.text
+    user_data = await state.get_data()
+    room_name = user_data.get("new_room_name")
+    await message.answer(
+        text=f'Для комнаты "{room_name}" был задан пароль: "{password}"!',
+    )
+    kvazi_db.rooms_name[room_name] = password
+    print('Словарь комнат обновился:')
+    print(kvazi_db.rooms_name)
+    await state.clear()
+
