@@ -14,6 +14,9 @@ bot = Bot(TOKEN)
 start_router = Router()
 
 
+#TODO необходим хэндлер, для ловли любых сообщений (в том, числе /start) при статусе StateFilter(None),
+# который будет проверять наличие юзера в БД (на случай перезагрузки бота или удаления юзером переписки).
+
 @start_router.message(Command("start"), StateFilter(None))
 async def start_dialogue(message: Message):
     """
@@ -57,7 +60,7 @@ async def check_rooms_name(message: Message, state: FSMContext) -> None:
 
     print(f'Юзер {message.chat.id}: check_rooms_name')
 
-    if message.text in kvazi_db.rooms_name.keys():
+    if message.text in kvazi_db.rooms_and_passwords.keys():
         print(f'Комната "{message.text}" существует, запрошен пароль')
         await state.set_state(Entering.waiting_for_new_rooms_password)
         await message.answer(text=f'Введите пароль для комнаты {message.text}')
@@ -96,7 +99,7 @@ async def make_room_with_current_name(callback: CallbackQuery, state: FSMContext
 @start_router.message(StateFilter(Entering.waiting_for_new_rooms_password))
 async def accept_the_password(message: Message, state: FSMContext) -> None:
     """
-    Хэндлер ловит пароль новой для комнаты, имя которой передается в state, сохраняя полученную пару в kvazi_db
+    Хэндлер ловит пароль новой для комнаты, имя которой передается в state, сохраняя получившуюся пару в kvazi_db
     """
     print(f'Юзер {message.chat.id}: accept_the_password')
 
@@ -106,8 +109,18 @@ async def accept_the_password(message: Message, state: FSMContext) -> None:
     await message.answer(
         text=f'Для комнаты "{room_name}" был задан пароль: "{password}"!',
     )
-    kvazi_db.rooms_name[room_name] = password
+
+    #TODO в дальнейшем для работы с БД будут созданы свои функции
+    kvazi_db.rooms_and_passwords[room_name] = password
     print('Словарь комнат обновился:')
-    print(kvazi_db.rooms_name)
+    print(kvazi_db.rooms_and_passwords)
+
+    kvazi_db.users_and_roles[message.from_user.id] = {
+        'nickname': message.from_user.username,
+        'rooms': {room_name: 'admin'}
+     }
+    print('Словарь юзеров обновился:')
+    print(kvazi_db.users_and_roles)
+
     await state.clear()
 
