@@ -71,7 +71,7 @@ async def check_rooms_name(message: Message, state: FSMContext) -> None:
 
     print(f'Юзер {message.chat.id}: check_rooms_name')
 
-    if message.text in kvazi_db.rooms_and_passwords.keys():
+    if message.text in kvazi_db.rooms_settings.keys():
         print(f'Комната "{message.text}" существует, запрошен пароль')
         await state.set_state(Entering.waiting_for_new_rooms_password)
         await message.answer(text=f'Введите пароль для комнаты {message.text}')
@@ -122,9 +122,9 @@ async def accept_the_password(message: Message, state: FSMContext) -> None:
     )
 
     #TODO в дальнейшем для работы с БД будут созданы свои функции
-    kvazi_db.rooms_and_passwords[room_name] = password
+    kvazi_db.rooms_settings[room_name] = password
     print('Словарь комнат обновился:')
-    print(kvazi_db.rooms_and_passwords)
+    print(kvazi_db.rooms_settings)
 
     kvazi_db.users_and_roles[message.from_user.id] = {
         'nickname': message.from_user.username,
