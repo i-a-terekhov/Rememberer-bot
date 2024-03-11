@@ -5,6 +5,7 @@ rooms_settings = {
         'name': 'комната_1',
         'owner': 'telegram_id',
         'admins': ['telegram_id', 'telegram_id', 'telegram_id'],
+        'members': ['telegram_id', 'telegram_id', 'telegram_id'],
         'password': 'пароль111',
         'rights_to_create_task': 'all_users'
     }

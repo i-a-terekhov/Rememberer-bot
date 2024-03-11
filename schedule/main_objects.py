@@ -1,11 +1,59 @@
 import asyncio
 
 from aiogram import Bot
+from aiogram.types import Message
+
+from schedule.time import current_time
 
 
 class RegularSchedule:
     def __init__(self):
         pass
+
+
+class Users:
+    def __init__(self, message: Message):
+        self.telegram_id = message.from_user.id
+        self.nickname = message.from_user.username
+
+
+class Room:
+    users_and_roles = {}
+
+    def __init__(self, room_name, message: Message):
+        self.name = room_name
+        self.owner = message.from_user.id
+        self.admins = [message.from_user.id]
+        self.members = [message.from_user.id]
+        self.password = message.text
+        self.rights_to_create_task = 'all_users'
+
+    def add_configurate(self, user_id, room_name):
+        configurate = 'user_id' + '_&_' + 'room_name'
+        self.users_and_roles[configurate] = {
+                'telegram_id': user_id,
+                'nickname': self.owner,
+                'room': room_name,
+                'role': 'admin'
+            }
+
+
+class Task:
+    def __init__(self, room_name, text, author, executor):
+        self.number = "random number"  # уник. номер комнаты, будет генерится функцией
+        self.room = room_name
+        self.text = text  # текст задачи
+        self.author = author
+        self.executor = executor
+        self.period_of_remind = '30:00'
+        self.execution_level = 0.0
+        self.accept_by_author = False
+        self.accept_in_time = '2025-12-31 23:59:59'
+        self.livetime_after_ending = '12:00:00'
+        self.list_of_recipients = [author]
+
+    def __str__(self):
+        return f"Task: {self.text}, Text: {self.text}, Accept in Time: {self.accept_in_time}"
 
 
 # Класс ListOfTasks создает экземпляр хранилища всех задач, не различая задачи между комнатами
@@ -19,52 +67,8 @@ class ListOfTasks:
         else:
             return True
 
-    def add_task(self, describe: str):
+    def add_task(self, describe: Task):
         self.list_of_tasks.append(describe)
-
-
-# Класс Task - создает экземпляры задач, каждая из которых содержит информацию о подзадачах и комнате
-# В момент создания задачи, комната передает значения своих актуальных настроек: имя комнаты, будет ли задача
-# видна всем (или только админу и тому, кому задача поручена), кто может утвердить завершение задачи
-class Task:
-    def __init__(self, room, text, category, reminder_time):
-        self.room = room  # уник. имя комнаты - ключ в словаре, значения для которого - лист с ID участников комнаты
-        self.text = text  # текст задачи - нулевое значение листа, остальные значения листа - подзадачи
-        self.reminder_time = reminder_time
-
-    def __str__(self):
-        return f"Task: {self.text}, Text: {self.text}, Reminder Time: {self.reminder_time}"
-
-    def make_task(self):
-        default_list_of_tasks = [
-            'Не забыть сделать',
-            'Не забыть купить',
-            'Не забыть посетить',
-            'Обновить пароли на сервисы'
-        ]
-
-
-#TODO Сделать описание
-# Класс Room создает экземпляры комнат, основной задачей которых является сохранение списка участников, для рассылки им
-# сообщений с задачами и сообщений о поставленных и выполненных задачах
-# Функционал комнат должен подразумевать наличие роли админа (одного или нескольких).
-# Админ решает, кто может добавлять задачи (только админы или все), кто может утвердить задачу
-# выполненной (только админы или все), производится ли рассылка задач всем или только ответственным.
-
-class Room:
-    def __init__(self, room_name):
-        self.room_name = room_name
-        self.members = []
-        self.categories = []
-        self.tasks = []
-
-    def add_member(self, user_id):
-        self.members.append(user_id)
-
-    def create_task(self, text, category, reminder_time):
-        task = Task(text, category, reminder_time)
-        self.tasks.append(task)
-        return task
 
 
 tasks = ListOfTasks()
@@ -72,15 +76,15 @@ tasks = ListOfTasks()
 
 # Для проверки работы periodic_start_for_functions
 async def send_message_for_check(bot_unit: Bot, chat_id: str, text: str):
-    print('send_message_for_check')
+    print(current_time(), ': send_message_for_check')
     await bot_unit.send_message(chat_id=chat_id, text=text)
 
 
 async def check_list_of_tasks(bot_unit: Bot, chat_id: str):
     if tasks.check_empty():
-        text = 'Есть некоторые задачи'
+        text = f'{current_time()}: Есть некоторые задачи'
     else:
-        text = 'Нет задач'
+        text = f'{current_time()}: Нет задач'
         tasks.add_task('Первая задача!')
     await send_message_for_check(bot_unit=bot_unit, chat_id=chat_id, text=text)
 
