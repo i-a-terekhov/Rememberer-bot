@@ -7,6 +7,7 @@ from database import kvazi_db
 from hidden.tokenfile import OWNER_CHAT_ID, TOKEN
 from keyboards.inline import make_inline_rows_keyboard
 from states.base import Entering
+from schedule.main_objects import UserType
 
 
 bot = Bot(TOKEN)
@@ -26,8 +27,6 @@ start_router = Router()
 #     # если юзер в бд: восстанавливаем его состояние из бд
 
 
-
-
 @start_router.message(Command("start"), StateFilter(None))
 async def start_dialogue(message: Message):
     """
@@ -35,6 +34,10 @@ async def start_dialogue(message: Message):
     """
 
     print(f'Юзер {message.chat.id}: start_dialogue')
+    # Заводим нового юзера и переносим данные в квази-БД
+    user = UserType(message=message)
+    user.save_to_bd()
+
     await message.answer(reply_markup=ReplyKeyboardRemove(), text='Добрый день!')
 
     await message.answer(

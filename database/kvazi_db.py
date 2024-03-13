@@ -1,4 +1,9 @@
-from random import randint
+
+
+users = ('111666', )  # "111666" - моделирование заполненности БД
+
+
+
 
 rooms_settings = {
     'комната_1': {
@@ -39,11 +44,3 @@ task = {
         'list of recipients': 'telegram_id тех, кто получает уведомление'
     }
 }
-
-random_number_not_exist = 0
-while True:
-    random = randint(1, 1000)
-    if random not in task.keys():
-        random_number_not_exist = random
-        break
-
