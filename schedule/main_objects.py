@@ -9,18 +9,18 @@ from database import kvazi_db
 
 
 class UserType:
-    users = tuple()
+    users = set()
 
     def __init__(self, message: Message):
-        self.telegram_id = message.from_user.id
+        self.telegram_id = str(message.from_user.id)
         self.nickname = message.from_user.username
-        UserType.users += (str(self.telegram_id), )
-        print('Кортеж в классе юзеров: ', UserType.users)
+        UserType.users.add(self.telegram_id)
+        print('Множество в классе юзеров: ', UserType.users)
 
     @classmethod
     def save_to_bd(cls):
         print(f'Состояние квази-базы до сохранения юзера {kvazi_db.users}')
-        kvazi_db.users += cls.users
+        kvazi_db.users.update(cls.users)
         print(f'Состояние квази-базы после сохранения юзера {kvazi_db.users}')
 
 
