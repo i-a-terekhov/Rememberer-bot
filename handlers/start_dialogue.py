@@ -52,27 +52,27 @@ async def start_dialogue(message: Message):
 @start_router.callback_query(F.data.in_(["Войти в комнату"]), StateFilter(None))
 async def ask_for_rooms_name(callback: CallbackQuery, state: FSMContext) -> None:
     """
-    Хэндлер обработки кнопки "Войти в комнату", меняет состояние на "Ожидает имя комнаты"
+    Хэндлер обработки кнопки "Войти в комнату", меняет состояние на "Ожидает имя старой комнаты"
     """
 
     await callback.answer()
     print(f'Юзер {callback.from_user.id}: нажал на кнопку "Войти в комнату"')
 
     # Задаем стейт ожидания имени комнаты
-    await state.set_state(Entering.waiting_for_rooms_name)
+    await state.set_state(Entering.waiting_for_old_rooms_name)
 
     await callback.message.answer(
         text="Введите название комнаты (регистр имеет значение!)",
     )
 
 
-@start_router.message(StateFilter(Entering.waiting_for_rooms_name))
-async def check_rooms_name(message: Message, state: FSMContext) -> None:
+@start_router.message(StateFilter(Entering.waiting_for_old_rooms_name))
+async def check_old_room_name(message: Message, state: FSMContext) -> None:
     """
     Хэндлер проверки имени комнаты на предмет существования
     """
 
-    print(f'Юзер {message.chat.id}: check_rooms_name')
+    print(f'Юзер {message.chat.id}: check_old_room_name')
 
     if message.text in kvazi_db.rooms_settings.keys():
         print(f'Комната "{message.text}" существует, запрошен пароль')
@@ -86,9 +86,8 @@ async def check_rooms_name(message: Message, state: FSMContext) -> None:
 
         await message.answer(
             text="Комнаты с таким именем не существует! Вы можете ввести имя комнаты заново (просто напишите в чат).\n"
-                 "Либо Вы можете создать комнату с введенным именем (кнопка).\n"
-                 "Либо Вы можете создать комнату с другим именем (кнопка).",
-            reply_markup=make_inline_rows_keyboard(['Использовать текущее имя', 'Выбрать другое имя'])
+                 "Либо Вы можете создать комнату с введенным именем (кнопка).\n",
+            reply_markup=make_inline_rows_keyboard(['Использовать текущее имя'])
         )
 
 
@@ -123,18 +122,60 @@ async def accept_the_password(message: Message, state: FSMContext) -> None:
     await message.answer(
         text=f'Для комнаты "{room_name}" был задан пароль: "{password}"!',
     )
-
-    #TODO в дальнейшем для работы с БД будут созданы свои функции
+    # TODO смотри в main_objects класс для создания настроек комнаты:
     kvazi_db.rooms_settings[room_name] = password
     print('Словарь комнат обновился:')
     print(kvazi_db.rooms_settings)
 
-    kvazi_db.users_and_roles[message.from_user.id] = {
+    #TODO смотри в main_objects класс для создания конфигурации:
+    configurate = str(message.from_user.id) + '_in_' + room_name
+    kvazi_db.users_and_roles[configurate] = {
+        'telegram_id': message.from_user.id,
         'nickname': message.from_user.username,
-        'rooms': {room_name: 'admin'}
+        'room_name': room_name,
+        'role': 'admin'
      }
     print('Словарь юзеров обновился:')
     print(kvazi_db.users_and_roles)
 
     await state.clear()
 
+
+# Фильтр "StateFilter(None)" для того, чтобы после однократного нажатия, кнопка перестала реагировать:
+@start_router.callback_query(F.data.in_(["Создать комнату"]), StateFilter(None))
+async def ask_for_new_rooms_name(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Хэндлер обработки кнопки "Создать комнату", меняет состояние на "Ожидает имя новой комнаты"
+    """
+
+    await callback.answer()
+    print(f'Юзер {callback.from_user.id}: нажал на кнопку "Создать комнату"')
+
+    # Задаем стейт ожидания имени комнаты
+    await state.set_state(Entering.waiting_for_new_rooms_name)
+
+    await callback.message.answer(
+        text="Введите название комнаты (регистр имеет значение!)",
+    )
+
+
+@start_router.message(StateFilter(Entering.waiting_for_new_rooms_name))
+async def check_new_room_name(message: Message, state: FSMContext) -> None:
+    """
+    Хэндлер проверки имени комнаты на предмет существования
+    """
+
+    print(f'Юзер {message.chat.id}: check_new_room_name')
+
+    if message.text not in kvazi_db.rooms_settings.keys():
+        print(f'Имя комнаты "{message.text}" не конфликтует с имеющимися, запрошен пароль')
+        await state.set_state(Entering.waiting_for_new_rooms_password)
+        await message.answer(text=f'Введите пароль для комнаты {message.text} (просто напишите в чат).')
+    else:
+        # В этом варианте стейт не меняется, но сохраняем введенное пользователем имя комнаты, на случай,
+        # если пользователь захочет использовать это имя на следующем шаге
+        await state.update_data(new_room_name=message.text)
+        print(f'Комната с таким именем уже существует. Используйте другое имя')
+
+        await message.answer(
+            text="Комната с таким именем уже существует! Вы можете ввести имя комнаты заново (просто напишите в чат).")

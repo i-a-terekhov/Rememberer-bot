@@ -37,11 +37,11 @@ class Rooms:
         self.password = message.text
         self.rights_to_create_task = 'all_users'
 
-        configurate = user_id + '_&_' + room_name
+        configurate = user_id + '_in_' + room_name
         Rooms.users_and_roles[configurate] = {
                 'telegram_id': user_id,
                 'nickname': message.from_user.username,
-                'room': room_name,
+                'room_name': room_name,
                 'role': 'admin'
             }
 

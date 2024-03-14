@@ -17,13 +17,13 @@ rooms_settings = {
 }
 
 
-configurate = 'user_id' + '_&_' + 'room_name'
+configurate = 'user_id' + '_in_' + 'room_name'
 
 users_and_roles = {
     configurate: {
         'telegram_id': '1111111',
         'nickname': 'vasoyk',
-        'room': 'firs_room',
+        'room_name': 'first_room',
         'role': 'admin'
     }
 }
