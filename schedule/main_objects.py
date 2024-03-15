@@ -1,4 +1,5 @@
 import asyncio
+from pprint import pprint
 from random import randint
 
 from aiogram import Bot
@@ -9,57 +10,72 @@ from database import kvazi_db
 
 
 class UserType:
-    users = set()
+    users = kvazi_db.users
 
     def __init__(self, message: Message):
         self.telegram_id = str(message.from_user.id)
-        self.nickname = message.from_user.username
         UserType.users.add(self.telegram_id)
-        print('Множество в классе юзеров: ', UserType.users)
+        print('Множество в классе UserType: ', UserType.users)
 
     @classmethod
     def save_to_bd(cls):
-        print(f'Состояние квази-базы до сохранения юзера {kvazi_db.users}')
+        # print(f'Квази-база до сохранения юзеров из класса:')
+        # pprint(kvazi_db.users)
         kvazi_db.users.update(cls.users)
-        print(f'Состояние квази-базы после сохранения юзера {kvazi_db.users}')
+        print(f'Квази-база после сохранения юзеров из класса:')
+        pprint(kvazi_db.users)
 
 
-class Rooms:
-    users_and_roles = {}
+class ConfigurateType:
+    users_and_roles = kvazi_db.users_and_roles
+
+    def __init__(self, room_name: str, message: Message):
+        configurate = str(message.from_user.id) + '_in_' + room_name
+        ConfigurateType.users_and_roles[configurate] = {
+            'telegram_id': str(message.from_user.id),
+            'nickname': message.from_user.username,
+            'room': room_name,
+            'role': 'owner'
+        }
+
+    @classmethod
+    def save_to_bd(cls):
+        # print(f'Квази-база до сохранения конфигураций из класса:')
+        # pprint(kvazi_db.users_and_roles)
+        kvazi_db.users_and_roles.update(cls.users_and_roles)
+        print(f'Квази-база после сохранения конфигураций из класса:')
+        pprint(kvazi_db.users_and_roles)
+
+
+class RoomType:
+    rooms_settings = kvazi_db.rooms_settings
 
     def __init__(self, room_name: str, message: Message):
         user_id = str(message.from_user.id)
-
-        self.name = room_name
-        self.owner = user_id
-        self.admins = [user_id]
-        self.members = [user_id]
-        self.password = message.text
-        self.rights_to_create_task = 'all_users'
-
-        configurate = user_id + '_in_' + room_name
-        Rooms.users_and_roles[configurate] = {
-                'telegram_id': user_id,
-                'nickname': message.from_user.username,
-                'room_name': room_name,
-                'role': 'admin'
-            }
+        RoomType.rooms_settings[room_name] = {
+            'name': room_name,
+            'owner': user_id,
+            'admins': [user_id],
+            'members': [user_id],
+            'password': message.text,
+            'rights_to_create_task': 'all_users'
+        }
 
     @classmethod
     def is_room_exist(cls, room_name: str):
-        if room_name in cls.users_and_roles:
+        if room_name in cls.rooms_settings:
             return True
         else:
             return False
 
-    def add_user_to_room(self, room_name: str, message: Message):
-        configurate = str(message.from_user.id) + '_&_' + room_name
-        Rooms.users_and_roles[configurate] = {
-            'telegram_id': str(message.from_user.id),
-            'nickname': message.from_user.username,
-            'room': room_name,
-            'role': 'user'
-        }
+    @classmethod
+    def save_to_bd(cls):
+        # print(f'Квази-база до сохранения комнат из класса:')
+        # pprint(kvazi_db.rooms_settings)
+        kvazi_db.rooms_settings.update(cls.rooms_settings)
+        print(f'Квази-база после сохранения комнат из класса:')
+        pprint(kvazi_db.rooms_settings)
+
 
 
 class Tasks:

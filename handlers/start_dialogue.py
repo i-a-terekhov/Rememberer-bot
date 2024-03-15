@@ -1,13 +1,13 @@
 from aiogram import Router, F, Bot
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery, InputFile, FSInputFile
+from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 
 from database import kvazi_db
 from hidden.tokenfile import OWNER_CHAT_ID, TOKEN
 from keyboards.inline import make_inline_rows_keyboard
 from states.base import Entering
-from schedule.main_objects import UserType
+from schedule.main_objects import UserType, ConfigurateType, RoomType
 
 
 bot = Bot(TOKEN)
@@ -74,7 +74,7 @@ async def check_old_room_name(message: Message, state: FSMContext) -> None:
 
     print(f'Юзер {message.chat.id}: check_old_room_name')
 
-    if message.text in kvazi_db.rooms_settings.keys():
+    if RoomType.is_room_exist(room_name=message.text):
         print(f'Комната "{message.text}" существует, запрошен пароль')
         await state.set_state(Entering.waiting_for_new_rooms_password)
         await message.answer(text=f'Введите пароль для комнаты {message.text}')
@@ -91,7 +91,7 @@ async def check_old_room_name(message: Message, state: FSMContext) -> None:
         )
 
 
-@start_router.callback_query(F.data.in_(["Использовать текущее имя"]))
+@start_router.callback_query(F.data.in_(["Использовать текущее имя"]), StateFilter(Entering.waiting_for_old_rooms_name))
 async def make_room_with_current_name(callback: CallbackQuery, state: FSMContext) -> None:
     """
     Хэндлер обработки кнопки "Использовать текущее имя для комнаты",
@@ -119,24 +119,18 @@ async def accept_the_password(message: Message, state: FSMContext) -> None:
     password = message.text
     user_data = await state.get_data()
     room_name = user_data.get("new_room_name")
+
+    # Заводим новую конфигурацию юзера_in_комнаты и переносим данные в квази-БД
+    config = ConfigurateType(room_name=room_name, message=message)
+    config.save_to_bd()
+
+    # Заводим новую группу и переносим данные в квази-БД
+    room = RoomType(room_name=room_name, message=message)
+    room.save_to_bd()
+
     await message.answer(
         text=f'Для комнаты "{room_name}" был задан пароль: "{password}"!',
     )
-    # TODO смотри в main_objects класс для создания настроек комнаты:
-    kvazi_db.rooms_settings[room_name] = password
-    print('Словарь комнат обновился:')
-    print(kvazi_db.rooms_settings)
-
-    #TODO смотри в main_objects класс для создания конфигурации:
-    configurate = str(message.from_user.id) + '_in_' + room_name
-    kvazi_db.users_and_roles[configurate] = {
-        'telegram_id': message.from_user.id,
-        'nickname': message.from_user.username,
-        'room_name': room_name,
-        'role': 'admin'
-     }
-    print('Словарь юзеров обновился:')
-    print(kvazi_db.users_and_roles)
 
     await state.clear()
 
@@ -168,14 +162,11 @@ async def check_new_room_name(message: Message, state: FSMContext) -> None:
     print(f'Юзер {message.chat.id}: check_new_room_name')
 
     if message.text not in kvazi_db.rooms_settings.keys():
+        await state.update_data(new_room_name=message.text)
         print(f'Имя комнаты "{message.text}" не конфликтует с имеющимися, запрошен пароль')
         await state.set_state(Entering.waiting_for_new_rooms_password)
         await message.answer(text=f'Введите пароль для комнаты {message.text} (просто напишите в чат).')
     else:
-        # В этом варианте стейт не меняется, но сохраняем введенное пользователем имя комнаты, на случай,
-        # если пользователь захочет использовать это имя на следующем шаге
-        await state.update_data(new_room_name=message.text)
         print(f'Комната с таким именем уже существует. Используйте другое имя')
-
         await message.answer(
             text="Комната с таким именем уже существует! Вы можете ввести имя комнаты заново (просто напишите в чат).")

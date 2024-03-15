@@ -3,6 +3,15 @@
 users = {'111666'}  # "111666" - моделирование заполненности БД
 
 
+configurate = 'user_id' + '_in_' + 'room_name'
+users_and_roles = {
+    configurate: {
+        'telegram_id': '1111111',
+        'nickname': 'vasoyk',
+        'room_name': 'first_room',
+        'role': 'admin'
+    }
+}
 
 
 rooms_settings = {
@@ -17,16 +26,7 @@ rooms_settings = {
 }
 
 
-configurate = 'user_id' + '_in_' + 'room_name'
 
-users_and_roles = {
-    configurate: {
-        'telegram_id': '1111111',
-        'nickname': 'vasoyk',
-        'room_name': 'first_room',
-        'role': 'admin'
-    }
-}
 
 
 task = {
