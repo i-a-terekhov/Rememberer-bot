@@ -29,13 +29,15 @@ class UserType:
 class ConfigurateType:
     users_and_roles = kvazi_db.users_and_roles
 
-    def __init__(self, room_name: str, message: Message):
+    def __init__(self, room_name: str, message: Message, role: str):
+        if role not in ['owner', 'admin', 'user']:
+            raise ValueError("Role must be one of: 'owner', 'admin', 'user'")
         configurate = str(message.from_user.id) + '_in_' + room_name
         ConfigurateType.users_and_roles[configurate] = {
             'telegram_id': str(message.from_user.id),
             'nickname': message.from_user.username,
             'room': room_name,
-            'role': 'owner'
+            'role': role
         }
 
     @classmethod
@@ -64,6 +66,13 @@ class RoomType:
     @classmethod
     def is_room_exist(cls, room_name: str):
         if room_name in cls.rooms_settings:
+            return True
+        else:
+            return False
+
+    @classmethod
+    def is_password_correct(cls, room_name, password):
+        if cls.rooms_settings[room_name]['password'] == password:
             return True
         else:
             return False

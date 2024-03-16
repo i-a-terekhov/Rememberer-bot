@@ -3,10 +3,10 @@
 users = {'111666'}  # "111666" - моделирование заполненности БД
 
 
-configurate = 'user_id' + '_in_' + 'room_name'
+configurate = 'user_id' + '_in_' + 'first_room'
 users_and_roles = {
     configurate: {
-        'telegram_id': '1111111',
+        'telegram_id': 'user_id',
         'nickname': 'vasoyk',
         'room_name': 'first_room',
         'role': 'admin'
