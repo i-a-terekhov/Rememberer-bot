@@ -2,7 +2,7 @@ import asyncio
 from pprint import pprint
 from random import randint
 
-from aiogram import Bot
+from aiogram import Bot, exceptions
 from aiogram.types import Message
 
 from schedule.time import current_time
@@ -125,23 +125,31 @@ class Tasks:
         Tasks.all_tasks[number] = self.new_task
 
 
-def check_empty():
-    if len(Tasks.all_tasks) > 0:
-        return True
-    else:
-        return False
-
-
 task_01 = Tasks(room_name='01', text='sadfas', author='me', executor='2342')
 
 
 # Для проверки работы periodic_start_for_functions
 async def send_message_for_check(bot_unit: Bot, chat_id: str, text: str):
     print(current_time(), ': send_message_for_check')
+    # Получаем информацию о чате
+    try:
+        chat = await bot_unit.get_chat(chat_id)
+    except Exception:
+        print(f"Юзер '{chat_id}' не найден")
+        return
+    if not chat:
+        print(f"Чат '{chat_id}' не существует")
+        return
+
     await bot_unit.send_message(chat_id=chat_id, text=text)
 
 
 async def check_list_of_tasks(bot_unit: Bot, chat_id: str):
+    def check_empty():
+        if len(Tasks.all_tasks) > 0:
+            return True
+        else:
+            return False
 
     if check_empty():
         text = f'{current_time()}: Есть некоторые задачи'
@@ -149,6 +157,13 @@ async def check_list_of_tasks(bot_unit: Bot, chat_id: str):
         text = f'{current_time()}: Нет задач'
         task_01.save_task()
     await send_message_for_check(bot_unit=bot_unit, chat_id=chat_id, text=text)
+
+
+async def check_is_user_in_rooms(bot_unit: Bot):
+    for config in ConfigurateType.users_and_roles:
+        chat_id = ConfigurateType.users_and_roles[config]["telegram_id"]
+        text = f'Вы состоите в группе: {ConfigurateType.users_and_roles[config]["room"]}'
+        await send_message_for_check(bot_unit=bot_unit, chat_id=chat_id, text=text)
 
 
 async def periodic_start_for_functions(bot: Bot, chat_id: str):
@@ -160,5 +175,6 @@ async def periodic_start_for_functions(bot: Bot, chat_id: str):
 
     while True:
         await check_list_of_tasks(bot_unit=bot, chat_id=chat_id)
+        await check_is_user_in_rooms(bot_unit=bot)
         await asyncio.sleep(60 * 2)
 

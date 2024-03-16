@@ -8,7 +8,7 @@ users_and_roles = {
     configurate: {
         'telegram_id': 'user_id',
         'nickname': 'vasoyk',
-        'room_name': 'first_room',
+        'room': 'first_room',
         'role': 'admin'
     }
 }
