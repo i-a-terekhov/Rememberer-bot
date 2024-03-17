@@ -26,21 +26,19 @@ rooms_settings = {
 }
 
 
-
-
-
-task = {
+all_tasks = {
     'random_number': {
         'number': 'random_number',
         'room': 'комната_1',
         'text': 'текст задачи',
         'author': 'telegram_id автора',
         'executor': 'telegram_id исполнителя',
+        'create_time': '2023-12-10 14:30',
         'period_of_remind': '30:00',
         'execution_level': 'уровень выполнения',
         'accept_by_author': False,
-        'accept_in_time': '2023-12-10 15:30:00',
-        'livetime_after_ending': '12:00:00',
+        'accept_in_time': '2023-12-10 15:30',
+        'livetime_after_ending': '12:00',
         'list of recipients': 'telegram_id тех, кто получает уведомление'
     }
 }
