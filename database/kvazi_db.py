@@ -1,14 +1,17 @@
+# for example:
+user_id = str(5180054391)
+room_name = 'пробная комната'
 
 
-users = {'111666'}  # "111666" - моделирование заполненности БД
+users = {'111666', user_id}  # "111666" - моделирование заполненности БД
 
 
-configurate = 'user_id' + '_in_' + 'first_room'
+configurate = user_id + '_in_' + room_name
 users_and_roles = {
     configurate: {
-        'telegram_id': 'user_id',
+        'telegram_id': user_id,
         'nickname': 'vasoyk',
-        'room': 'first_room',
+        'room': room_name,
         'role': 'admin'
     }
 }
@@ -16,11 +19,11 @@ users_and_roles = {
 
 rooms_settings = {
     'комната_1': {
-        'name': 'комната_1',
-        'owner': 'telegram_id',
-        'admins': ['telegram_id', 'telegram_id', 'telegram_id'],
-        'members': ['telegram_id', 'telegram_id', 'telegram_id'],
-        'password': 'пароль111',
+        'name': room_name,
+        'owner': user_id,
+        'admins': [user_id, 'telegram_id', 'telegram_id'],
+        'members': [user_id, 'telegram_id', 'telegram_id'],
+        'password': 'пароль',
         'rights_to_create_task': 'all_users'
     }
 }
@@ -28,10 +31,9 @@ rooms_settings = {
 
 all_tasks = {
     'random_number': {
-        'number': 'random_number',
-        'room': 'комната_1',
+        'room': room_name,
         'text': 'текст задачи',
-        'author': 'telegram_id автора',
+        'author': user_id,
         'executor': 'telegram_id исполнителя',
         'create_time': '2023-12-10 14:30',
         'period_of_remind': '30:00',

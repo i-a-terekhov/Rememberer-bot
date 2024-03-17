@@ -113,10 +113,16 @@ class Tasks:
     @classmethod
     def generate_tasks(cls):
         for i in range(1):
-            room_name = f"комната_1"
+            room_name = kvazi_db.room_name
             text = f"Задача такая-то {randint(0, 10)}"
-            author = f"Автор такой-то"
+            author = kvazi_db.user_id
             executor = f"Исполнитель такой-то"
             task = Tasks(room_name, text, author, executor)
+            task.new_task["execution_level"] = randint(0, 100) / 100
             Tasks.all_tasks['task_num_' + str(cls.make_unic_number())] = task.new_task
         return Tasks.all_tasks
+
+    @classmethod
+    def iter_tasks(cls):
+        for task in cls.all_tasks:
+            yield cls.all_tasks[task]
