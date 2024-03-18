@@ -12,7 +12,7 @@ def one_key(text: str, callback_data: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[row])
 
 
-def many_keys_in_row(buttons: list) -> InlineKeyboardMarkup:
+def many_keys_in_row(buttons: list[tuple]) -> InlineKeyboardMarkup:
     """
     Создаёт инлайн-клавиатуру с одной или несколькими кнопками
     :param buttons: список кортежей вида (текст кнопки, текст каллбека)

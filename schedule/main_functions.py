@@ -10,8 +10,10 @@ from schedule.time import current_time
 # Для проверки работы periodic_start_for_functions
 example_tasks = Tasks.generate_tasks()
 
-#TODO первый шаг: итерируемся по конфигурациям, вытаскивая ID_юзера, группу и досупные юзеру задачи
-#TODO формируем сообщение из доступных юзеру задач
+#TODO первый шаг: итерируемся по комнатам, фильтруя общий список тасков.
+# Отфильтровав (сформировав) пул тасков для комнаты, итерируемся по таскам, рассылая задачи тем, кому следует исходя из
+# настроек комнаты
+#TODO формируем сообщение из каждой доступной юзеру задач
 
 
 async def send_message_for_check(bot_unit: Bot, chat_id: str, text: str):
@@ -32,14 +34,33 @@ async def send_message_for_check(bot_unit: Bot, chat_id: str, text: str):
     )
 
 
+def _form_task_message_for_show(task: dict) -> str:
+    room_name = task['room']
+    task_text = task['text']
+    executor_id = task['executor']
+    create_time = task['create_time']
+    execution_level = task['execution_level']
+    accept_by_author = task['accept_by_author']
+
+    execut = int(execution_level * 100 // 10)
+    non_exec = 10 - execut
+    if accept_by_author:
+        accept = "V"
+    else:
+        accept = "X"
+    execution_bar = f'[{"#" * execut}{"-" * non_exec}][{accept}]'
+
+    text = f'{create_time}. Комната: {room_name}, ответственный {executor_id}.\n' \
+           f'Задача: {task_text}\n' \
+           f'Выполнение: {execution_bar}'
+    return text
+
+
+
 async def going_through_all_tasks(bot_unit: Bot):
     for task in Tasks.iter_tasks():
-        text = task["text"]
-        room = task["room"]
-        execution_level = task["execution_level"]
-        chat_id = task["author"]
-        print(f'Смотрим на задачу {text} из комнаты {room}')
-        text += f' (выполнено: {execution_level})'
+        chat_id = task['author']
+        text = _form_task_message_for_show(task=task)
         await send_message_for_check(bot_unit=bot_unit, chat_id=chat_id, text=text)
 
 
