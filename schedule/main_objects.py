@@ -126,3 +126,9 @@ class Tasks:
     def iter_tasks(cls):
         for task in cls.all_tasks:
             yield cls.all_tasks[task]
+
+
+class AssignmentForMailing:
+    # класс для формирования "рассыльного задания" из общего списка тасков,
+    # и последующего разбиения его на отдельные рассылки
+    pass
