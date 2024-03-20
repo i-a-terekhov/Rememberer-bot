@@ -129,6 +129,20 @@ class Tasks:
 
 
 class AssignmentForMailing:
-    # класс для формирования "рассыльного задания" из общего списка тасков,
-    # и последующего разбиения его на отдельные рассылки
-    pass
+    # TODO Рассмотреть целесообразность одноэкземплярного класса
+    all_tasks = kvazi_db.all_tasks
+    rooms = {}
+    for task in all_tasks:
+        configurate = task['room_name'] + '_in_' + task['user_id']
+        rooms[configurate] = "проверка"
+    print(rooms)
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def get_mails(cls):
+        pass
+
+
+
