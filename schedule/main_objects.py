@@ -129,20 +129,38 @@ class Tasks:
 
 
 class AssignmentForMailing:
-    # TODO Рассмотреть целесообразность одноэкземплярного класса
     all_tasks = kvazi_db.all_tasks
-    rooms = {}
-    for task in all_tasks:
-        configurate = task['room_name'] + '_in_' + task['user_id']
-        rooms[configurate] = "проверка"
-    print(rooms)
-
-    def __init__(self):
-        pass
+    addressee = {}
+    # addressee = {'12213134': {
+    #                 'room_id': ['task', 'task2', 'task3']
+    #                   },
+    #              '23452456': {
+    #                  'room_id': ['task'],
+    #                  'room2_id': ['task3', 'task2']
+    #                 }
+    #              }
 
     @classmethod
     def get_mails(cls):
-        pass
+        for rand_num, task in cls.all_tasks.items():
+            executor = task['executor']
+            room = task['room']
+            # Если исполнитель уже есть в словаре addressee, добавляем комнату в его список
+            if executor in cls.addressee:
+                if room not in cls.addressee[executor]:
+                    cls.addressee[executor][room] = [rand_num]
+                else:
+                    cls.addressee[executor][room].append(rand_num)
+            # Если исполнителя нет в словаре addressee, добавляем его и его комнату
+            else:
+                cls.addressee[executor] = {room: [rand_num]}
+        print('Вот:')
+        pprint(cls.addressee)
+        print('Вот')
+
+        result = cls.addressee
+        cls.addressee = {}
+        return result
 
 
 

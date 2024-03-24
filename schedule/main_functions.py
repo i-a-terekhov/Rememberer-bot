@@ -4,7 +4,7 @@ from pprint import pprint
 from aiogram import Bot
 
 from keyboards.inline import make_inline_rows_keyboard, many_keys_in_row
-from schedule.main_objects import Tasks, ConfigurateType
+from schedule.main_objects import Tasks, ConfigurateType, AssignmentForMailing
 from schedule.time import current_time
 
 # Для проверки работы periodic_start_for_functions
@@ -56,8 +56,9 @@ def _form_task_message_for_show(task: dict) -> str:
     return text
 
 
-
 async def going_through_all_tasks(bot_unit: Bot):
+    probe = AssignmentForMailing()
+    probe.get_mails()
     for task in Tasks.iter_tasks():
         chat_id = task['author']
         text = _form_task_message_for_show(task=task)
