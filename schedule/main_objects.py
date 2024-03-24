@@ -54,7 +54,7 @@ class RoomType:
             'admins': [user_id],
             'members': [user_id],
             'password': message.text,
-            'rights_to_create_task': 'all_users'
+            'rights_to_create_task': 'owner'
         }
 
     @classmethod
@@ -131,32 +131,38 @@ class Tasks:
 class AssignmentForMailing:
     all_tasks = kvazi_db.all_tasks
     addressee = {}
-    # addressee = {'12213134': {
-    #                 'room_id': ['task', 'task2', 'task3']
-    #                   },
-    #              '23452456': {
-    #                  'room_id': ['task'],
-    #                  'room2_id': ['task3', 'task2']
+
+    # Шаблон словаря для рассылки:
+    # addressee = {
+    #     'room_id': {
+    #         '12213134': ['task', 'task2', 'task3'],
+    #         '23452456': ['task'],
+    #                 },
+    #     'room2_id': {
+    #         '23452456': ['task3', 'task2']
     #                 }
-    #              }
+    #             }
 
     @classmethod
     def get_mails(cls):
+        """
+        Функция формирует словарь addressee для рассылки сообщений пользователю с группировкой по группам
+        """
         for rand_num, task in cls.all_tasks.items():
             executor = task['executor']
             room = task['room']
-            # Если исполнитель уже есть в словаре addressee, добавляем комнату в его список
-            if executor in cls.addressee:
-                if room not in cls.addressee[executor]:
-                    cls.addressee[executor][room] = [rand_num]
+            # Если комната и получатель уже есть в словаре addressee, добавляем номер задачи в его список
+            if room in cls.addressee:
+                if executor not in cls.addressee[room]:
+                    cls.addressee[room][executor] = [rand_num]
                 else:
-                    cls.addressee[executor][room].append(rand_num)
-            # Если исполнителя нет в словаре addressee, добавляем его и его комнату
+                    cls.addressee[room][executor].append(rand_num)
+            # Если комнаты нет в словаре addressee, добавляем ее и получателя
             else:
-                cls.addressee[executor] = {room: [rand_num]}
-        print('Вот:')
+                cls.addressee[room] = {executor: [rand_num]}
+        print('Сформированный словарь рассылок с группировкой по группам:')
         pprint(cls.addressee)
-        print('Вот')
+        print('-' * 50)
 
         result = cls.addressee
         cls.addressee = {}

@@ -1,6 +1,7 @@
-# for example:
-user_id = str(5180054391)
-room_name = 'пробная комната'
+from hidden.tokenfile import OWNER_CHAT_ID
+
+user_id = str(OWNER_CHAT_ID)
+room_name = 'Базовая комната'
 
 
 users = {'111666', user_id}  # "111666" - моделирование заполненности БД
@@ -10,7 +11,7 @@ configurate = user_id + '_in_' + room_name
 users_and_roles = {
     configurate: {
         'telegram_id': user_id,
-        'nickname': 'vasoyk',
+        'nickname': 'OWNER',
         'room': room_name,
         'role': 'admin'
     }
@@ -18,13 +19,13 @@ users_and_roles = {
 
 
 rooms_settings = {
-    'комната_1': {
+    room_name: {
         'name': room_name,
         'owner': user_id,
-        'admins': [user_id, 'telegram_id', 'telegram_id'],
-        'members': [user_id, 'telegram_id', 'telegram_id'],
+        'admins': [user_id],
+        'members': [user_id],
         'password': 'пароль',
-        'rights_to_create_task': 'all_users'
+        'rights_to_create_task': 'admins'  # один из ['owner', 'admins', 'members']
     }
 }
 
@@ -44,3 +45,5 @@ all_tasks = {
         'list_of_recipients': 'telegram_id тех, кто получает уведомление'
     }
 }
+
+

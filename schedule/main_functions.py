@@ -10,17 +10,12 @@ from schedule.time import current_time
 # Для проверки работы periodic_start_for_functions
 example_tasks = Tasks.generate_tasks()
 
-#TODO первый шаг: итерируемся по таскам, формируя рассыльное задание для бота (AssignmentForMailing), исходя из
-# настроек комнаты
-#TODO для каждого найденного юзера в рассыльном задании, формируем список тасков, группируя по комнатам и снабжая
-# информационными сообщениями
-
 
 async def send_message_for_check(bot_unit: Bot, chat_id: str, text: str):
     try:
         await bot_unit.get_chat(chat_id)
-    except Exception:
-        print(f"Юзер '{chat_id}' не найден")
+    except Exception as e:
+        print(f"Юзер '{chat_id}' не найден. Ошибка: {e}")
         return
     await bot_unit.send_message(
         chat_id=chat_id,
@@ -35,6 +30,9 @@ async def send_message_for_check(bot_unit: Bot, chat_id: str, text: str):
 
 
 def _form_task_message_for_show(task: dict) -> str:
+    """
+    Функция формирования текстового сообщения из task для отправки юзеру
+    """
     room_name = task['room']
     task_text = task['text']
     executor_id = task['executor']
