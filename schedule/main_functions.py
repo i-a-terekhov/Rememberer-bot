@@ -54,13 +54,25 @@ def _form_task_message_for_show(task: dict) -> str:
     return text
 
 
+# TODO реформат: перевести на работу с классом AssignmentForMailing
 async def going_through_all_tasks(bot_unit: Bot):
     probe = AssignmentForMailing()
-    probe.get_mails()
-    for task in Tasks.iter_tasks():
-        chat_id = task['author']
-        text = _form_task_message_for_show(task=task)
-        await send_message_for_check(bot_unit=bot_unit, chat_id=chat_id, text=text)
+    mails = probe.get_mails()
+    print('going_through_all_tasks')
+    print(mails)
+    for room in mails:
+        try:
+            chat_id = int(room['telegram_id исполнителя'])
+            text = f'Вы находитесь в комнате {room}, в которой для вас есть задачи:'
+            await send_message_for_check(bot_unit=bot_unit, chat_id=chat_id, text=text)
+        except TypeError:
+            pass
+
+
+    # for task in Tasks.iter_tasks():
+    #     chat_id = task['author']
+    #     text = _form_task_message_for_show(task=task)
+    #     await send_message_for_check(bot_unit=bot_unit, chat_id=chat_id, text=text)
 
 
 # TODO удалить: временная функция для проверки класса Tasks
