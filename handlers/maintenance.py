@@ -16,8 +16,8 @@ service_router.callback_query.filter(MagicData(F.maintenance_mode.is_(True)))
 # Хэндлеры роутера regular_router используются ВНЕ режима обслуживания,
 # т.е. когда maintenance_mode на диспетчере равен False или не указан вообще
 regular_router = Router()
-service_router.message.filter(MagicData(F.maintenance_mode.is_(False)))
-service_router.callback_query.filter(MagicData(F.maintenance_mode.is_(False)))
+regular_router.message.filter(MagicData(F.maintenance_mode.is_(False)))
+regular_router.callback_query.filter(MagicData(F.maintenance_mode.is_(False)))
 
 bot = Bot(TOKEN)
 

@@ -25,7 +25,11 @@ rooms_settings = {
         'admins': [user_id],
         'members': [user_id],
         'password': 'пароль',
-        'rights_to_create_task': 'admins'  # один из ['owner', 'admins', 'members']
+        'rights_to_create_task': 'admins',  # один из ['owner', 'admins', 'members']
+        'period_of_remind': '30:00',  # значение, которое будут получать каждая task по умолчанию
+        'execution_level': 0.0,  # значение, которое будут получать каждая task по умолчанию
+        'accept_by_author': False,  # значение, которое будут получать каждая task по умолчанию
+        'livetime_after_ending': '12:00',  # значение, которое будут получать каждая task по умолчанию
     }
 }
 

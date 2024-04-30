@@ -7,7 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from hidden.tokenfile import TOKEN_FIVE as TOKEN
 from hidden.tokenfile import OWNER_CHAT_ID as CHAT_ID
 
-from handlers.echo_plug import service_router, regular_router
+from handlers.maintenance import service_router, regular_router
 from handlers.start_dialogue import start_router
 from schedule.main_functions import periodic_start_for_functions
 
