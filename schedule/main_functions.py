@@ -4,11 +4,8 @@ from pprint import pprint
 from aiogram import Bot
 
 from keyboards.inline import make_inline_rows_keyboard, many_keys_in_row
-from schedule.main_objects import Tasks, ConfigurateType, AssignmentForMailing
+from schedule.main_objects import TasksCash, ConfigurateType
 from schedule.time import current_time
-
-# Для проверки работы periodic_start_for_functions
-example_tasks = Tasks.generate_tasks()
 
 
 async def send_message_for_check(bot_unit: Bot, chat_id: str, text: str):
@@ -77,10 +74,10 @@ async def going_through_all_tasks(bot_unit: Bot):
 
 # TODO удалить: временная функция для проверки класса Tasks
 async def check_list_of_tasks(bot_unit: Bot, chat_id: str):
-    if len(Tasks.all_tasks) > 0:
-        text = f'{current_time()}: Есть некоторые задачи ({len(Tasks.all_tasks)}), но добавим еще...'
-        Tasks.generate_tasks()
-        pprint(Tasks.all_tasks)
+    if len(TasksCash.all_tasks) > 0:
+        text = f'{current_time()}: Есть некоторые задачи ({len(TasksCash.all_tasks)}), но добавим еще...'
+        TasksCash.generate_tasks()
+        pprint(TasksCash.all_tasks)
     else:
         text = f'{current_time()}: Нет задач'
         example_tasks.save_task()

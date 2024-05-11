@@ -1,5 +1,6 @@
+import re
 from pprint import pprint
-from random import randint
+from random import randint, choice
 
 from aiogram.types import Message
 
@@ -78,93 +79,170 @@ class RoomType:
         pprint(kvazi_db.rooms_settings)
 
 
-class Tasks:
-    all_tasks = kvazi_db.all_tasks
+class TasksCash:
+    """
+    Класс для создания буфера БД и работы с ним.
+    При объявлении класса создается ссылка all_tasks на словарь из модуля kvazi_bd. Сом словарь из kvazi_bd
+    формируется и сохраняется в БД методами, определенными в kvazi_bd.
+    Классовые методы позволят работать с информацией в словаре (обновлять, редактировать).
+    """
 
-    def __init__(self, room_name, text, author, executor):
-        # self.number = "random number"  # уник. номер комнаты, будет генерится функцией
-        self.new_task = {
-                'room': room_name,
-                'text': text,
-                'author': author,
-                'executor': executor,
-                'create_time': current_datatime(),
-                'period_of_remind': '30:00',
-                'execution_level': 0.0,
-                'accept_by_author': False,
-                'accept_in_time': '2025-12-31 23:59',
-                'livetime_after_ending': '12:00',
-                'list_of_recipients': [author],
-        }
+    print('Получаем текущую версию БД из kvazi_db в переменную')
+    all_tasks = kvazi_db.all_tasks
+    # 'create_time': current_datatime()  # Будет внедрено в следующем шаге
+
 
     @classmethod
-    def make_unic_number(cls) -> str:
+    def _make_unic_number_for_task(cls) -> str:
+        """
+        Внутренняя функция для генерации случайного числа задания, не совпадающего с имеющимися
+        """
         while True:
-            number = str(randint(1, 1000))
+            number = str(randint(1, 10000))
             if number in cls.all_tasks.keys():
                 continue
             else:
                 return str(number)
 
-    def save_task(self):
-        number = Tasks.make_unic_number()
-        Tasks.all_tasks[number] = self.new_task
+    @classmethod
+    def check_task(cls, some_task: dict) -> bool:
+        """
+        Функция проверяет входящий словарь на соответствие формату буфера БД
+        """
+        # Эталонная запись
+        one = {
+            'number': '',
+            'recipient_id': 0,
+            'nickname': '',
+            'room': '',
+            'text': '',
+            'author': '',
+            'executor': 0,
+            'create_time': '2023-12-10 14:30',
+            'period_of_remind': '30:00',
+            'execution_level': 0.0,
+            'accept_by_author': False,
+            'accept_in_time': '2023-12-10 15:30',
+            'livetime_after_ending': '12:00',
+        }
+
+        if set(some_task.keys()) != set(one.keys()):
+            return False
+
+        for key, value in some_task.items():
+            if key in ('recipient_id', 'executor'):
+                if not isinstance(value, int):
+                    return False
+            elif key in ('number', 'nickname', 'room', 'text', 'author'):
+                if not isinstance(value, str):
+                    return False
+            elif key in ('create_time', 'accept_in_time'):
+                if not isinstance(value, str):
+                    return False
+                if not re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$', value):
+                    return False
+            elif key in ('period_of_remind', 'livetime_after_ending'):
+                if not isinstance(value, str):
+                    return False
+                if not re.match(r'^\d{2}:\d{2}$', value):
+                    return False
+            elif key == 'execution_level':
+                if not isinstance(value, float) or value < 0 or value > 1:
+                    return False
+            elif key == 'accept_by_author':
+                if not isinstance(value, bool):
+                    return False
+            else:
+                # Неизвестный ключ
+                return False
+        print('Проверка пройдена!')
+        return True
+
+
 
     @classmethod
-    def generate_tasks(cls):
-        for i in range(1):
-            room_name = kvazi_db.room_name
-            text = f"Задача такая-то {randint(0, 10)}"
-            author = kvazi_db.user_id
-            executor = f"Исполнитель такой-то"
-            task = Tasks(room_name, text, author, executor)
-            task.new_task["execution_level"] = randint(0, 100) / 100
-            Tasks.all_tasks['task_num_' + str(cls.make_unic_number())] = task.new_task
-        return Tasks.all_tasks
+    def generate_some_tasks(cls, number_of_tasks: int = 10):
+        """
+        Функция добавляет в буфер БД несколько случайных задач
+        """
+        recipients = {231423: 'Вася', 231424: 'Петя', 231425: 'Ваня', 231426: 'Толя'}
+        rooms = ['Первая комната', 'Красная комната', 'Пятая комната', 'Комната 101', 'Тайная комната',
+                 'Секретная комната']
+        tasks = ['Постирать носки', 'Купить хлеб', 'Заточить ножи', 'Скачать торрент', 'Пройти курс Python',
+                 'Принять душ']
+
+        for i in range(number_of_tasks):
+            number = cls._make_unic_number_for_task()
+            recipient_id = choice(list(recipients.keys()))
+            some_task = {
+                'number': number,
+                'recipient_id': recipient_id,  # получатель уведомления (в данной структуре всегда один)
+                'nickname': recipients[recipient_id],
+                'room': choice(rooms),  # откуда пришла задача
+                'text': choice(tasks),
+                'author': recipients[choice(list(recipients.keys()))],  # автор задачи, который подтверждает завершение
+                'executor': choice(list(recipients.keys())),
+                # участник, ответственный за завершение (может быть только один)
+                'create_time': '2023-12-10 14:30',
+                'period_of_remind': '30:00',
+                'execution_level': randint(0, 100) / 100,
+                'accept_by_author': False,
+                'accept_in_time': '2023-12-10 15:30',
+                'livetime_after_ending': '12:00',
+            }
+            if cls.check_task(some_task=some_task):
+                cls.all_tasks[number] = some_task
+
+
+    @classmethod
+    def save_task(cls, new_task):
+        """
+        Функция сохраняет в буфер задачу
+        """
+        number = TasksCash._make_unic_number_for_task()
+        TasksCash.all_tasks[number] = new_task
 
     @classmethod
     def iter_tasks(cls):
         for task in cls.all_tasks:
             yield cls.all_tasks[task]
 
+    # Шаблон словаря для рассылки:
+    # addressee = {
+    #     'room_id': {
+    #         '12213134': ['task', 'task2', 'task3'],
+    #         '23452456': ['task'],
+    #                 },
+    #     'room2_id': {
+    #         '23452456': ['task3', 'task2']
+    #                 }
+    #             }
 
-class AssignmentForMailing:
-
-    def __init__(self):
-        self.all_tasks = kvazi_db.all_tasks
-
-        # Шаблон словаря для рассылки:
-        # addressee = {
-        #     'room_id': {
-        #         '12213134': ['task', 'task2', 'task3'],
-        #         '23452456': ['task'],
-        #                 },
-        #     'room2_id': {
-        #         '23452456': ['task3', 'task2']
-        #                 }
-        #             }
-
-    def get_mails(self):
+    @classmethod
+    def get_mails(cls):
         """
-        Метод из all_tasks формирует словарь addressee для рассылки сообщений пользователю с группировкой по группам
+        Метод формирует словарь addressee для рассылки сообщений пользователю с группировкой по группам
         """
 
-        self.addressee = {}
-        for rand_num, task in self.all_tasks.items():
+        addressee = {}
+        for rand_num, task in cls.all_tasks.items():
             executor = task['executor']
             room = task['room']
-            if room in self.addressee:
-                if executor not in self.addressee[room]:
-                    self.addressee[room][executor] = [rand_num]
+            if room in addressee:
+                if executor not in addressee[room]:
+                    addressee[room][executor] = [rand_num]
                 else:
-                    self.addressee[room][executor].append(rand_num)
+                    addressee[room][executor].append(rand_num)
             else:
-                self.addressee[room] = {executor: [rand_num]}
+                addressee[room] = {executor: [rand_num]}
         print('Сформированный словарь рассылок с группировкой по группам:')
-        pprint(self.addressee)
+        pprint(addressee)
         print('-' * 50)
 
-        return self.addressee
+        return addressee
 
 
+db_cash = TasksCash
+db_cash.generate_some_tasks()
+pprint(db_cash.all_tasks)
 
