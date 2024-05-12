@@ -6,6 +6,7 @@ from aiogram.types import Message
 
 from schedule.time import current_datatime
 from database import kvazi_db
+from hidden.tokenfile import OWNER_CHAT_ID
 
 
 # class UserType:
@@ -161,7 +162,7 @@ class TasksCash:
         """
         Функция добавляет в буфер БД несколько случайных задач
         """
-        recipients = {231423: 'Вася', 231424: 'Петя', 231425: 'Ваня', 231426: 'Толя'}
+        recipients = {231423: 'Вася', 231424: 'Петя', 231425: 'Ваня', 231426: 'Толя', OWNER_CHAT_ID: 'Создатель'}
         rooms = ['Первая комната', 'Красная комната', 'Пятая комната', 'Комната 101', 'Тайная комната',
                  'Секретная комната']
         tasks = ['Постирать носки', 'Купить хлеб', 'Заточить ножи', 'Скачать торрент', 'Пройти курс Python',

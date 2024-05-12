@@ -5,25 +5,28 @@ from aiogram import Bot
 
 from keyboards.inline import make_inline_rows_keyboard, many_keys_in_row
 from schedule.main_cash_objects import TasksCash
-from schedule.time import current_time
+from schedule.time import current_datatime
 
 
-# async def send_message_for_check(bot_unit: Bot, chat_id: str, text: str):
-#     try:
-#         await bot_unit.get_chat(chat_id)
-#     except Exception as e:
-#         print(f"Юзер '{chat_id}' не найден. Ошибка: {e}")
-#         return
-#     await bot_unit.send_message(
-#         chat_id=chat_id,
-#         text=text,
-#         reply_markup=many_keys_in_row([
-#             ('+1/4', 'callback_data_01'),
-#             ('+1/3', 'callback_data_02'),
-#             ('+1/2', 'callback_data_03'),
-#             ('Всё!', 'callback_data_04')]
-#              )
-#     )
+async def send_message_with_bottoms(bot_unit: Bot, chat_id: str, text: str) -> None:
+    """
+    Функция отправки пользователю сообщения с кнопками готовности задачи
+    """
+    try:
+        await bot_unit.get_chat(chat_id)
+    except Exception as e:
+        print(f"{current_datatime()}: Юзер '{chat_id}' не найден. Ошибка: {e} (send_message_for_check)")
+        return
+    await bot_unit.send_message(
+        chat_id=chat_id,
+        text=text,
+        reply_markup=many_keys_in_row([
+            ('+1/4', 'callback_data_01'),
+            ('+1/3', 'callback_data_02'),
+            ('+1/2', 'callback_data_03'),
+            ('Всё!', 'callback_data_04')]
+             )
+    )
 
 
 # def _form_task_message_for_show(task: dict) -> str:
@@ -51,30 +54,27 @@ from schedule.time import current_time
 #     return text
 
 
-async def going_through_all_tasks(bot_unit: Bot):
+async def going_through_all_tasks(bot_unit: Bot) -> None:
+    """
+    Функция достает из кэша БД задачу и передает в send_message_with_bottoms
+    """
+    db_cash = TasksCash()
+    db_cash.generate_some_tasks()
+    mails = db_cash.get_mails()
+    print(f'{current_datatime()}: Обрабатываем задачи из буфера БД (going_through_all_tasks)')
 
-    probe = AssignmentForMailing()
-    mails = probe.get_mails()
-    print('going_through_all_tasks')
-    print(mails)
     for room in mails:
         try:
-            chat_id = int(room['telegram_id исполнителя'])
+            chat_id = room['telegram_id исполнителя']
             text = f'Вы находитесь в комнате {room}, в которой для вас есть задачи:'
-            await send_message_for_check(bot_unit=bot_unit, chat_id=chat_id, text=text)
+            await send_message_with_bottoms(bot_unit=bot_unit, chat_id=chat_id, text=text)
         except TypeError:
-            pass
+            print(f'{current_datatime()}: Не удалось отправить задачу на логин из-за проблем с кэшем БД')
 
 
-    # for task in Tasks._iter_tasks():
-    #     chat_id = task['author']
-    #     text = _form_task_message_for_show(task=task)
-    #     await send_message_for_check(bot_unit=bot_unit, chat_id=chat_id, text=text)
-
-
-async def periodic_start_for_functions(bot: Bot):
+async def periodic_start_for_functions(bot: Bot) -> None:
     """
-    Функция переодического запуска going_through_all_tasks
+    Функция периодического запуска going_through_all_tasks
     """
     while True:
         await going_through_all_tasks(bot_unit=bot)
