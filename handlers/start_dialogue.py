@@ -3,6 +3,8 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 
+from random import choice
+
 from hidden.tokenfile import TOKEN
 from keyboards.inline import make_inline_rows_keyboard
 from states.base import Entering
@@ -13,21 +15,33 @@ bot = Bot(TOKEN)
 start_router = Router()
 
 
-# @start_router.message(Command("start"), StateFilter(None))
-# async def start_dialogue(message: Message):
-#     """
-#     Старовый диалог для создания комнаты или входа в имеющуюся
-#     """
-#     user = UserType(message=message)
-#     user.save_to_bd()
-#
-#     await message.answer(reply_markup=ReplyKeyboardRemove(), text='Добрый день!')
-#     await message.answer(
-#         text="Я бот-ассистент для задач, которым не нашлось места в расписании!\n"
-#              "Вы можете войти в имеющуюся комнату (если знаете название комнаты и пароль) или создать новую.\n"
-#              "Можно находится в нескольких комнатах одновременно!",
-#         reply_markup=make_inline_rows_keyboard(['Войти в комнату', 'Создать комнату'])
-#     )
+@start_router.message(Command("start"), StateFilter(None))
+async def start_dialogue(message: Message):
+    """
+    Старовый диалог.
+    Хэндлер проверяет наличие юзера в БД и либо предлагает зарегистрироваться, либо выдает стандартные кнопки.
+
+    """
+
+    # user = UserType(message=message)
+    # user.save_to_bd()
+    user = choice([0, 1])
+
+    await message.answer(reply_markup=ReplyKeyboardRemove(), text='Добрый день!')
+    if user:
+        await message.answer(
+            text="Я Вас узнал! Продолжим работу!",
+            reply_markup=make_inline_rows_keyboard(['Войти в комнату', 'Создать комнату'])
+        )
+        # + функция выдачи актуальных задач
+    else:
+        await message.answer(
+            text="Я бот-ассистент для задач, которым не нашлось места в расписании!\n"
+                 "Вы сможете оставлять задачи в чате, а я будут периодически о них напоминать\n"
+                 "Более того, вы сможете создать одну или несколько комнат и пригласить туда других людей,"
+                 "чтобы координировать выполнение задач или отслеживать их выполнение.",
+            reply_markup=make_inline_rows_keyboard(['Начнем работу!'])
+        )
 
 
 # Фильтр "StateFilter(None)" для того, чтобы после однократного нажатия, кнопка перестала реагировать:

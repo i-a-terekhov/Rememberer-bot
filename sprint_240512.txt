@@ -36,7 +36,7 @@
 [ожидание] - _form_task_message_for_show
 
     7) В start_dialogue переписать хэндлеры:
-[ожидание] - start_dialogue
+[готово] - start_dialogue
 [ожидание] - ask_for_rooms_name
 [ожидание] - check_old_room_name
 [ожидание] - check_old_room_password
@@ -44,6 +44,9 @@
 [ожидание] - save_password_for_new_room
 [ожидание] - ask_for_new_rooms_name
 [ожидание] - check_new_room_name
+
+    8) В kvazi_db:
+- создать временный словарь users для сохранения юзеров (и их публичного имени, и имени их приватной группы)
 
 
     10) В kvazi_db добавить функции взаимодействия с БД:
