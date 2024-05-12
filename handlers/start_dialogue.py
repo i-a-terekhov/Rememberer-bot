@@ -6,7 +6,7 @@ from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 from hidden.tokenfile import TOKEN
 from keyboards.inline import make_inline_rows_keyboard
 from states.base import Entering
-from schedule.main_objects import UserType, ConfigurateType, RoomType
+from schedule.main_cash_objects import UserType, ConfigurateType, RoomType
 
 
 bot = Bot(TOKEN)

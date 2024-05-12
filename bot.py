@@ -9,7 +9,7 @@ from hidden.tokenfile import OWNER_CHAT_ID as CHAT_ID
 
 from handlers.maintenance import service_router, regular_router
 from handlers.start_dialogue import start_router
-from schedule.main_functions import periodic_start_for_functions
+from schedule.main_bot_functions import periodic_start_for_functions
 
 bot_unit = Bot(TOKEN)
 
@@ -39,7 +39,7 @@ async def main(bot: Bot):
 
 async def gathering_functions():
     await asyncio.gather(
-        periodic_start_for_functions(bot=bot_unit, chat_id=CHAT_ID),
+        periodic_start_for_functions(bot=bot_unit),
         main(bot=bot_unit)
     )
 

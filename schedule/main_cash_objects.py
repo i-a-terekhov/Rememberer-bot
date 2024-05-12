@@ -8,75 +8,75 @@ from schedule.time import current_datatime
 from database import kvazi_db
 
 
-class UserType:
-    users = kvazi_db.users
+# class UserType:
+#     users = kvazi_db.users
 
-    def __init__(self, message: Message):
-        self.telegram_id = str(message.from_user.id)
-        UserType.users.add(self.telegram_id)
-        print('Множество в классе UserType: ', UserType.users)
+    # def __init__(self, message: Message):
+    #     self.telegram_id = str(message.from_user.id)
+    #     UserType.users.add(self.telegram_id)
+    #     print('Множество в классе UserType: ', UserType.users)
 
-    @classmethod
-    def save_to_bd(cls):
-        kvazi_db.users.update(cls.users)
-        print(f'Квази-база после сохранения юзеров из класса:')
-        pprint(kvazi_db.users)
-
-
-class ConfigurateType:
-    users_and_roles = kvazi_db.users_and_roles
-
-    def __init__(self, room_name: str, message: Message, role: str):
-        if role not in ['owner', 'admin', 'user']:
-            raise ValueError("Role must be one of: 'owner', 'admin', 'user'")
-        configurate = str(message.from_user.id) + '_in_' + room_name
-        ConfigurateType.users_and_roles[configurate] = {
-            'telegram_id': str(message.from_user.id),
-            'nickname': message.from_user.username,
-            'room': room_name,
-            'role': role
-        }
-
-    @classmethod
-    def save_to_bd(cls):
-        kvazi_db.users_and_roles.update(cls.users_and_roles)
-        print(f'Квази-база после сохранения конфигураций из класса:')
-        pprint(kvazi_db.users_and_roles)
+    # @classmethod
+    # def save_to_bd(cls):
+    #     kvazi_db.users.update(cls.users)
+    #     print(f'Квази-база после сохранения юзеров из класса:')
+    #     pprint(kvazi_db.users)
 
 
-class RoomType:
-    rooms_settings = kvazi_db.rooms_settings
+# class ConfigurateType:
+#     users_and_roles = kvazi_db.users_and_roles
 
-    def __init__(self, room_name: str, message: Message):
-        user_id = str(message.from_user.id)
-        RoomType.rooms_settings[room_name] = {
-            'name': room_name,
-            'owner': user_id,
-            'admins': [user_id],
-            'members': [user_id],
-            'password': message.text,
-            'rights_to_create_task': 'owner'
-        }
+    # def __init__(self, room_name: str, message: Message, role: str):
+    #     if role not in ['owner', 'admin', 'user']:
+    #         raise ValueError("Role must be one of: 'owner', 'admin', 'user'")
+    #     configurate = str(message.from_user.id) + '_in_' + room_name
+    #     ConfigurateType.users_and_roles[configurate] = {
+    #         'telegram_id': str(message.from_user.id),
+    #         'nickname': message.from_user.username,
+    #         'room': room_name,
+    #         'role': role
+    #     }
 
-    @classmethod
-    def is_room_exist(cls, room_name: str):
-        if room_name in cls.rooms_settings:
-            return True
-        else:
-            return False
+    # @classmethod
+    # def save_to_bd(cls):
+    #     kvazi_db.users_and_roles.update(cls.users_and_roles)
+    #     print(f'Квази-база после сохранения конфигураций из класса:')
+    #     pprint(kvazi_db.users_and_roles)
 
-    @classmethod
-    def is_password_correct(cls, room_name, password):
-        if cls.rooms_settings[room_name]['password'] == password:
-            return True
-        else:
-            return False
 
-    @classmethod
-    def save_to_bd(cls):
-        kvazi_db.rooms_settings.update(cls.rooms_settings)
-        print(f'Квази-база после сохранения комнат из класса:')
-        pprint(kvazi_db.rooms_settings)
+# class RoomType:
+#     rooms_settings = kvazi_db.rooms_settings
+
+    # def __init__(self, room_name: str, message: Message):
+    #     user_id = str(message.from_user.id)
+    #     RoomType.rooms_settings[room_name] = {
+    #         'name': room_name,
+    #         'owner': user_id,
+    #         'admins': [user_id],
+    #         'members': [user_id],
+    #         'password': message.text,
+    #         'rights_to_create_task': 'owner'
+    #     }
+
+    # @classmethod
+    # def is_room_exist(cls, room_name: str):
+    #     if room_name in cls.rooms_settings:
+    #         return True
+    #     else:
+    #         return False
+
+    # @classmethod
+    # def is_password_correct(cls, room_name, password):
+    #     if cls.rooms_settings[room_name]['password'] == password:
+    #         return True
+    #     else:
+    #         return False
+
+    # @classmethod
+    # def save_to_bd(cls):
+    #     kvazi_db.rooms_settings.update(cls.rooms_settings)
+    #     print(f'Квази-база после сохранения комнат из класса:')
+    #     pprint(kvazi_db.rooms_settings)
 
 
 class TasksCash:
@@ -87,10 +87,8 @@ class TasksCash:
     Классовые методы позволят работать с информацией в словаре (обновлять, редактировать).
     """
 
-    print('Получаем текущую версию БД из kvazi_db в переменную')
+    print(f'{current_datatime()}: Получаем текущую версию БД из kvazi_db в переменную')
     all_tasks = kvazi_db.all_tasks
-    # 'create_time': current_datatime()  # Будет внедрено в следующем шаге
-
 
     @classmethod
     def _make_unic_number_for_task(cls) -> str:
@@ -155,10 +153,8 @@ class TasksCash:
             else:
                 # Неизвестный ключ
                 return False
-        print('Проверка пройдена!')
+        print(f'{current_datatime()}: Проверка пройдена! В буфер БД добавлена новая задача.')
         return True
-
-
 
     @classmethod
     def generate_some_tasks(cls, number_of_tasks: int = 10):
@@ -190,52 +186,56 @@ class TasksCash:
                 'accept_in_time': '2023-12-10 15:30',
                 'livetime_after_ending': '12:00',
             }
-            if cls.check_task(some_task=some_task):
-                cls.all_tasks[number] = some_task
-
+            cls.save_task(new_task=some_task)
 
     @classmethod
-    def save_task(cls, new_task):
+    def save_task(cls, new_task: dict) -> None:
         """
         Функция сохраняет в буфер задачу
         """
-        number = TasksCash._make_unic_number_for_task()
-        TasksCash.all_tasks[number] = new_task
+        if cls.check_task(new_task):
+            number = TasksCash._make_unic_number_for_task()
+            TasksCash.all_tasks[number] = new_task
 
     @classmethod
-    def iter_tasks(cls):
+    def _iter_tasks(cls) -> dict:
+        """
+        Генератор, возвращающий по одной задаче за раз из буфера БД all_tasks
+        """
         for task in cls.all_tasks:
             yield cls.all_tasks[task]
 
-    # Шаблон словаря для рассылки:
-    # addressee = {
-    #     'room_id': {
-    #         '12213134': ['task', 'task2', 'task3'],
-    #         '23452456': ['task'],
-    #                 },
-    #     'room2_id': {
-    #         '23452456': ['task3', 'task2']
-    #                 }
-    #             }
-
     @classmethod
-    def get_mails(cls):
+    def get_mails(cls) -> dict:
         """
         Метод формирует словарь addressee для рассылки сообщений пользователю с группировкой по группам
         """
 
+        # Шаблон словаря для рассылки:
+        # addressee = {
+        #     'room_id': {
+        #         '12213134': ['task', 'task2', 'task3'],
+        #         '23452456': ['task'],
+        #                 },
+        #     'room2_id': {
+        #         '23452456': ['task3', 'task2']
+        #                 }
+        #             }
+
         addressee = {}
-        for rand_num, task in cls.all_tasks.items():
+        for task_num, task in cls.all_tasks.items():
             executor = task['executor']
             room = task['room']
+            task_text = f'{task_num}: {task["text"]}'
             if room in addressee:
                 if executor not in addressee[room]:
-                    addressee[room][executor] = [rand_num]
+                    addressee[room][executor] = [task_text]
                 else:
-                    addressee[room][executor].append(rand_num)
+                    addressee[room][executor].append(task_text)
             else:
-                addressee[room] = {executor: [rand_num]}
-        print('Сформированный словарь рассылок с группировкой по группам:')
+                addressee[room] = {executor: [task_text]}
+        print(f'{current_datatime()}: Сформированный словарь рассылок с группировкой по группам:')
+        print('-' * 50)
         pprint(addressee)
         print('-' * 50)
 
@@ -244,5 +244,5 @@ class TasksCash:
 
 db_cash = TasksCash
 db_cash.generate_some_tasks()
-pprint(db_cash.all_tasks)
+a = db_cash.get_mails()
 

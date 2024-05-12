@@ -3,39 +3,42 @@ from pprint import pprint
 from hidden.tokenfile import OWNER_CHAT_ID
 
 user_id = str(OWNER_CHAT_ID)
-room_name = 'Базовая комната'
+room_name = 'base_room_' + user_id
 
 
-users = {'111666', user_id}  # "111666" - моделирование заполненности БД
+# users = {'111666', user_id}  # "111666" - моделирование заполненности БД
 
 
-configurate = user_id + '_in_' + room_name
-users_and_roles = {
-    configurate: {
-        'telegram_id': user_id,
-        'nickname': 'OWNER',
-        'room': room_name,
-        'role': 'admin'
-    }
-}
+# configurate = user_id + '_in_' + room_name
+# users_and_roles = {
+#     configurate: {
+#         'telegram_id': user_id,
+#         'nickname': 'OWNER',
+#         'room': room_name,
+#         'role': 'admin'
+#     }
+# }
 
 
-rooms_settings = {
-    room_name: {
-        'name': room_name,
-        'owner': user_id,
-        'admins': [user_id],
-        'members': [user_id],
-        'password': 'пароль',
-        'rights_to_create_task': 'admins',  # один из ['owner', 'admins', 'members']
-        'period_of_remind': '30:00',  # значение, которое будут получать каждая task по умолчанию
-        'execution_level': 0.0,  # значение, которое будут получать каждая task по умолчанию
-        'accept_by_author': False,  # значение, которое будут получать каждая task по умолчанию
-        'livetime_after_ending': '12:00',  # значение, которое будут получать каждая task по умолчанию
-    }
-}
+# rooms_settings = {
+#     room_name: {
+#         'name': room_name,
+#         'owner': user_id,
+#         'admins': [user_id],
+#         'members': [user_id],
+#         'password': 'пароль',
+#         'rights_to_create_task': 'admins',  # один из ['owner', 'admins', 'members']
+#         'period_of_remind': '30:00',  # значение, которое будут получать каждая task по умолчанию
+#         'execution_level': 0.0,  # значение, которое будут получать каждая task по умолчанию
+#         'accept_by_author': False,  # значение, которое будут получать каждая task по умолчанию
+#         'livetime_after_ending': '12:00',  # значение, которое будут получать каждая task по умолчанию
+#     }
+# }
 
-all_tasks = {'29': {'accept_by_author': False, 'accept_in_time': '2023-12-10 15:30', 'author': 'Петя',
+# Словарь в all_tasks в будущем будет формироваться путем запроса к БД, с этим же словарем будет работать
+# класс TasksCash.
+all_tasks = {
+    '29': {'accept_by_author': False, 'accept_in_time': '2023-12-10 15:30', 'author': 'Петя',
                     'create_time': '2023-12-10 14:30', 'execution_level': 0.01, 'executor': 231423,
                     'livetime_after_ending': '12:00', 'nickname': 'Толя', 'number': '29', 'period_of_remind': '30:00',
                     'recipient_id': 231426, 'room': 'Тайная комната', 'text': 'Постирать носки'},
@@ -111,4 +114,5 @@ all_tasks = {'29': {'accept_by_author': False, 'accept_in_time': '2023-12-10 15:
              '929': {'number': '929', 'recipient_id': 231423, 'nickname': 'Вася', 'room': 'Секретная комната',
                      'text': 'Принять душ', 'author': 'Толя', 'executor': 231426, 'create_time': '2023-12-10 14:30',
                      'period_of_remind': '30:00', 'execution_level': 0.06, 'accept_by_author': False,
-                     'accept_in_time': '2023-12-10 15:30', 'livetime_after_ending': '12:00'}}
+                     'accept_in_time': '2023-12-10 15:30', 'livetime_after_ending': '12:00'}
+    }
