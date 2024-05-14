@@ -29,6 +29,7 @@
 [готово] - going_through_all_tasks
 [удален] - _form_task_message_for_show
 [готово] - send_message_with_bottoms
+[ожидание] - going_through_all_tasks - выявлено некоректное обращение к элементам словаря
 
     6) В main_bot_functions переписать функцию, ввиду изменения структуры отправки. Текст отправляемой
     задачи не будет содержать наименования комнаты - эта информация
@@ -37,7 +38,7 @@
 
     7) В start_dialogue переписать хэндлеры:
 [готово] - start_dialogue
-[ожидание] - ask_for_rooms_name
+[готово] - ask_for_rooms_name
 [ожидание] - check_old_room_name
 [ожидание] - check_old_room_password
 [ожидание] - make_room_with_current_name

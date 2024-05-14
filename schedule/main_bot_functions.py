@@ -64,12 +64,14 @@ async def going_through_all_tasks(bot_unit: Bot) -> None:
     print(f'{current_datatime()}: Обрабатываем задачи из буфера БД (going_through_all_tasks)')
 
     for room in mails:
-        try:
-            chat_id = room['telegram_id исполнителя']
-            text = f'Вы находитесь в комнате {room}, в которой для вас есть задачи:'
-            await send_message_with_bottoms(bot_unit=bot_unit, chat_id=chat_id, text=text)
-        except TypeError:
-            print(f'{current_datatime()}: Не удалось отправить задачу на логин из-за проблем с кэшем БД')
+        #TODO должен быть перебор telegram_id, а не символов, из которых состоит имя комнаты:
+        for telegram_id in room:
+            try:
+                # TODO добавить отправку общего сообщения для пользователя
+                text = f'Вы находитесь в комнате {room}, в которой для вас есть задачи:'
+                await send_message_with_bottoms(bot_unit=bot_unit, chat_id=telegram_id, text=text)
+            except TypeError:
+                print(f'{current_datatime()}: Не удалось отправить задачу т.к. логин {telegram_id} не найден')
 
 
 async def periodic_start_for_functions(bot: Bot) -> None:

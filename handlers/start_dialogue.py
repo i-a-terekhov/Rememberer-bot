@@ -50,11 +50,11 @@ async def start_dialogue(message: Message):
 async def ask_for_rooms_name(callback: CallbackQuery, state: FSMContext) -> None:
     """
     Хэндлер обработки кнопки "Войти в комнату" или кнопки "Выбрать другую комнату" после неудачной попытки ввода пароля.
-    Меняет состояние на "Ожидает имя старой комнаты"
+    Меняет состояние на "Ожидает имя существующей комнаты"
     """
     await callback.answer()
 
-    await state.set_state(Entering.waiting_for_old_rooms_name)
+    await state.set_state(Entering.waiting_for_exist_room_name)
     await callback.message.answer(
         text="Введите название комнаты (регистр имеет значение!)",
     )
@@ -101,7 +101,7 @@ async def ask_for_rooms_name(callback: CallbackQuery, state: FSMContext) -> None
 #         )
 
 
-@start_router.callback_query(F.data.in_(["Использовать текущее имя"]), StateFilter(Entering.waiting_for_old_rooms_name))
+@start_router.callback_query(F.data.in_(["Использовать текущее имя"]), StateFilter(Entering.waiting_for_exist_room_name))
 async def make_room_with_current_name(callback: CallbackQuery, state: FSMContext) -> None:
     """
     Хэндлер обработки кнопки "Использовать текущее имя для комнаты",
