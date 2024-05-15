@@ -2,8 +2,8 @@ from pprint import pprint
 
 from hidden.tokenfile import OWNER_CHAT_ID
 
-user_id = str(OWNER_CHAT_ID)
-room_name = 'base_room_' + user_id
+user_id = OWNER_CHAT_ID
+room_name = 'base_room_' + str(user_id)
 
 
 # users = {'111666', user_id}  # "111666" - моделирование заполненности БД
@@ -39,29 +39,29 @@ room_name = 'base_room_' + user_id
 # класс TasksCash.
 all_tasks = {
     '29': {'accept_by_author': False, 'accept_in_time': '2023-12-10 15:30', 'author': 'Петя',
-                    'create_time': '2023-12-10 14:30', 'execution_level': 0.01, 'executor': 231423,
+                    'create_time': '2023-12-10 14:30', 'execution_level': 0.01, 'executor': user_id,
                     'livetime_after_ending': '12:00', 'nickname': 'Толя', 'number': '29', 'period_of_remind': '30:00',
-                    'recipient_id': 231426, 'room': 'Тайная комната', 'text': 'Постирать носки'},
+                    'recipient_id': user_id, 'room': 'Тайная комната', 'text': 'Постирать носки'},
              '104': {'accept_by_author': False, 'accept_in_time': '2023-12-10 15:30', 'author': 'Петя',
-                     'create_time': '2023-12-10 14:30', 'execution_level': 0.39, 'executor': 231425,
+                     'create_time': '2023-12-10 14:30', 'execution_level': 0.39, 'executor': user_id,
                      'livetime_after_ending': '12:00', 'nickname': 'Толя', 'number': '104', 'period_of_remind': '30:00',
-                     'recipient_id': 231426, 'room': 'Красная комната', 'text': 'Купить хлеб'},
+                     'recipient_id': user_id, 'room': 'Красная комната', 'text': 'Купить хлеб'},
              '255': {'accept_by_author': False, 'accept_in_time': '2023-12-10 15:30', 'author': 'Петя',
-                     'create_time': '2023-12-10 14:30', 'execution_level': 0.55, 'executor': 231423,
+                     'create_time': '2023-12-10 14:30', 'execution_level': 0.55, 'executor': user_id,
                      'livetime_after_ending': '12:00', 'nickname': 'Ваня', 'number': '255', 'period_of_remind': '30:00',
-                     'recipient_id': 231425, 'room': 'Первая комната', 'text': 'Постирать носки'},
-             '512': {'number': '512', 'recipient_id': 231424, 'nickname': 'Петя', 'room': 'Первая комната',
-                     'text': 'Принять душ', 'author': 'Петя', 'executor': 231423, 'create_time': '2023-12-10 14:30',
+                     'recipient_id': user_id, 'room': 'Первая комната', 'text': 'Постирать носки'},
+             '512': {'number': '512', 'recipient_id': user_id, 'nickname': 'Петя', 'room': 'Первая комната',
+                     'text': 'Принять душ', 'author': 'Петя', 'executor': user_id, 'create_time': '2023-12-10 14:30',
                      'period_of_remind': '30:00', 'execution_level': 0.7, 'accept_by_author': False,
                      'accept_in_time': '2023-12-10 15:30', 'livetime_after_ending': '12:00'},
              '566': {'accept_by_author': False, 'accept_in_time': '2023-12-10 15:30', 'author': 'Ваня',
-                     'create_time': '2023-12-10 14:30', 'execution_level': 0.39, 'executor': 231424,
+                     'create_time': '2023-12-10 14:30', 'execution_level': 0.39, 'executor': user_id,
                      'livetime_after_ending': '12:00', 'nickname': 'Вася', 'number': '566', 'period_of_remind': '30:00',
-                     'recipient_id': 231423, 'room': 'Секретная комната', 'text': 'Пройти курс Python'},
+                     'recipient_id': user_id, 'room': 'Секретная комната', 'text': 'Пройти курс Python'},
              '691': {'accept_by_author': False, 'accept_in_time': '2023-12-10 15:30', 'author': 'Вася',
-                     'create_time': '2023-12-10 14:30', 'execution_level': 0.75, 'executor': 231425,
+                     'create_time': '2023-12-10 14:30', 'execution_level': 0.75, 'executor': user_id,
                      'livetime_after_ending': '12:00', 'nickname': 'Вася', 'number': '691', 'period_of_remind': '30:00',
-                     'recipient_id': 231423, 'room': 'Комната 101', 'text': 'Скачать торрент'},
+                     'recipient_id': user_id, 'room': 'Комната 101', 'text': 'Скачать торрент'},
              '707': {'accept_by_author': False, 'accept_in_time': '2023-12-10 15:30', 'author': 'Толя',
                      'create_time': '2023-12-10 14:30', 'execution_level': 0.03, 'executor': 231424,
                      'livetime_after_ending': '12:00', 'nickname': 'Вася', 'number': '707', 'period_of_remind': '30:00',

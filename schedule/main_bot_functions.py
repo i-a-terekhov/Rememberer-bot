@@ -8,15 +8,20 @@ from schedule.main_cash_objects import TasksCash
 from schedule.time import current_datatime
 
 
+async def send_simple_message(bot_unit: Bot, chat_id: str, text: str) -> None:
+    """
+    Функция отправки пользователю сообщения с кнопками готовности задачи
+    """
+    await bot_unit.send_message(
+        chat_id=chat_id,
+        text=text,
+    )
+
+
 async def send_message_with_bottoms(bot_unit: Bot, chat_id: str, text: str) -> None:
     """
     Функция отправки пользователю сообщения с кнопками готовности задачи
     """
-    try:
-        await bot_unit.get_chat(chat_id)
-    except Exception as e:
-        print(f"{current_datatime()}: Юзер '{chat_id}' не найден. Ошибка: {e} (send_message_for_check)")
-        return
     await bot_unit.send_message(
         chat_id=chat_id,
         text=text,
@@ -64,14 +69,19 @@ async def going_through_all_tasks(bot_unit: Bot) -> None:
     print(f'{current_datatime()}: Обрабатываем задачи из буфера БД (going_through_all_tasks)')
 
     for room in mails:
-        #TODO должен быть перебор telegram_id, а не символов, из которых состоит имя комнаты:
-        for telegram_id in room:
+        for telegram_id in mails[room]:
+            # print(f'Смотрим получателя {telegram_id}')
             try:
-                # TODO добавить отправку общего сообщения для пользователя
-                text = f'Вы находитесь в комнате {room}, в которой для вас есть задачи:'
-                await send_message_with_bottoms(bot_unit=bot_unit, chat_id=telegram_id, text=text)
-            except TypeError:
-                print(f'{current_datatime()}: Не удалось отправить задачу т.к. логин {telegram_id} не найден')
+                await bot_unit.get_chat(telegram_id)
+            except Exception as e:
+                # print(f"{current_datatime()}: Юзер '{telegram_id}' не найден. Ошибка: {e} (going_through_all_tasks)")
+                continue
+            room_text = f'В комнате {room}, есть задачи:'
+            await send_simple_message(bot_unit=bot_unit, chat_id=telegram_id, text=room_text)
+
+            for task in mails[room][telegram_id]:
+                task_text = task
+                await send_message_with_bottoms(bot_unit=bot_unit, chat_id=telegram_id, text=task_text)
 
 
 async def periodic_start_for_functions(bot: Bot) -> None:
