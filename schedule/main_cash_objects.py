@@ -227,14 +227,13 @@ class TasksCash:
         for task_num, task in cls.all_tasks.items():
             executor = task['executor']
             room = task['room']
-            task_text = f'{task_num}: {task["text"]}'
             if room in addressee:
                 if executor not in addressee[room]:
-                    addressee[room][executor] = [task_text]
+                    addressee[room][executor] = [task_num]
                 else:
-                    addressee[room][executor].append(task_text)
+                    addressee[room][executor].append(task_num)
             else:
-                addressee[room] = {executor: [task_text]}
+                addressee[room] = {executor: [task_num]}
         print(f'{current_datatime()}: Сформированный словарь рассылок с группировкой по группам:')
         print('-' * 50)
         pprint(addressee)
