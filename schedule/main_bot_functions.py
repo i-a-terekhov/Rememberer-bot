@@ -60,20 +60,22 @@ def _form_task_message_for_show(task: dict) -> str:
 
 
 async def going_through_all_tasks(bot_unit: Bot) -> None:
-    # Функция достает из кэша БД задачу и передает в send_message_with_bottoms
     """
-    Функция из кэша БД создает словарь готовых к отправке сообщений
+    Функция отправляет пользователям сообщения с тасками, структурированные по принадлежности к комнатам.
     """
     db_cash = TasksCash()
     db_cash.generate_some_tasks()  #TODO временная функция для наполнения кэша БД учебными данными
     mails = db_cash.get_mails()
     print(f'{current_datatime()}: Обрабатываем задачи из буфера БД (going_through_all_tasks)')
 
+    unic_users_with_tasks = []
     for room in mails:
         for telegram_id in mails[room]:
             # print(f'Смотрим получателя {telegram_id}')
             try:
                 await bot_unit.get_chat(telegram_id)
+                if telegram_id not in unic_users_with_tasks:
+                    unic_users_with_tasks.append(telegram_id)
             except Exception as e:
                 # print(f"{current_datatime()}: Юзер '{telegram_id}' не найден. Ошибка: {e} (going_through_all_tasks)")
                 continue
@@ -84,12 +86,20 @@ async def going_through_all_tasks(bot_unit: Bot) -> None:
 
             await send_message_with_bottoms(bot_unit=bot_unit, chat_id=telegram_id, text=final_text)
 
+    menu_text = 'Менюшка'
+    for user in unic_users_with_tasks:
+        await send_menu(bot_unit=bot_unit, chat_id=user, text=menu_text)
+
 
 async def send_menu(bot_unit: Bot, chat_id: str, text: str) -> None:
     """
     Функция отправки сообщения с меню
     """
-    pass
+    await bot_unit.send_message(
+        chat_id=chat_id,
+        text=text,
+        reply_markup=make_inline_rows_keyboard(['Мои комнаты', 'Мои задачи'])
+    )
 
 
 async def periodic_start_for_functions(bot: Bot) -> None:
@@ -99,5 +109,4 @@ async def periodic_start_for_functions(bot: Bot) -> None:
     while True:
         await going_through_all_tasks(bot_unit=bot)
         await asyncio.sleep(2)
-        await send_menu(bot_unit=bot)
         await asyncio.sleep(60 * 2)
