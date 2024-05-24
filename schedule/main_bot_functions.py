@@ -64,7 +64,7 @@ async def going_through_all_tasks(bot_unit: Bot) -> None:
     Функция отправляет пользователям сообщения с тасками, структурированные по принадлежности к комнатам.
     """
     db_cash = TasksCash()
-    db_cash.generate_some_tasks()  #TODO временная функция для наполнения кэша БД учебными данными
+    # db_cash.generate_some_tasks()  #TODO временная функция для наполнения кэша БД учебными данными
     mails = db_cash.get_mails()
     print(f'{current_datatime()}: Обрабатываем задачи из буфера БД (going_through_all_tasks)')
 
