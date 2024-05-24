@@ -59,14 +59,14 @@ def _form_task_message_for_show(task: dict) -> str:
     return text
 
 
-async def going_through_all_tasks(bot_unit: Bot) -> None:
+async def sending_for_standard_mailings(bot_unit: Bot) -> None:
     """
     Функция отправляет пользователям сообщения с тасками, структурированные по принадлежности к комнатам.
     """
     db_cash = TasksCash()
     # db_cash.generate_some_tasks()  #TODO временная функция для наполнения кэша БД учебными данными
     mails = db_cash.get_mails()
-    print(f'{current_datatime()}: Обрабатываем задачи из буфера БД (going_through_all_tasks)')
+    print(f'{current_datatime()}: Обрабатываем задачи из буфера БД (sending_all_standard_mailings)')
 
     unic_users_with_tasks = []
     for room in mails:
@@ -77,7 +77,7 @@ async def going_through_all_tasks(bot_unit: Bot) -> None:
                 if telegram_id not in unic_users_with_tasks:
                     unic_users_with_tasks.append(telegram_id)
             except Exception as e:
-                # print(f"{current_datatime()}: Юзер '{telegram_id}' не найден. Ошибка: {e} (going_through_all_tasks)")
+                # print(f"{current_datatime()}: Юзер '{telegram_id}' не найден. Ошибка: {e} (sending_all_standard_mailings)")
                 continue
             final_text = f'В комнате {room}, есть задачи:\n'
             for task in mails[room][telegram_id]:
@@ -102,11 +102,18 @@ async def send_menu(bot_unit: Bot, chat_id: str, text: str) -> None:
     )
 
 
+async def sending_standard_mailings(bot_unit: Bot) -> None:
+    """
+    Функция отправки стандартной рассылки по времени
+    """
+    pass
+
+
 async def periodic_start_for_functions(bot: Bot) -> None:
     """
-    Функция периодического запуска going_through_all_tasks
+    Функция периодического запуска sending_all_standard_mailings
     """
     while True:
-        await going_through_all_tasks(bot_unit=bot)
+        # await sending_all_standard_mailings(bot_unit=bot)
         await asyncio.sleep(2)
         await asyncio.sleep(60 * 2)

@@ -35,6 +35,13 @@ room_name = 'base_room_' + str(user_id)
 #     }
 # }
 
+# Словарь в timestamps_for_standard_mailings в будущем будет формироваться путем запроса к БД,
+# с этим же словарем будет работать класс TimeToMail.
+timestamps_for_standard_mailings = {
+    '2023-12-10 14:30': [user_id],
+    '2023-12-10 14:55': [231423, 231425]
+}
+
 # Словарь в all_tasks в будущем будет формироваться путем запроса к БД, с этим же словарем будет работать
 # класс TasksCash.
 all_tasks = {

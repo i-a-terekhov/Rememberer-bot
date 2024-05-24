@@ -242,7 +242,9 @@ class TasksCash:
         return addressee
 
 
-db_cash = TasksCash
-db_cash.generate_some_tasks()
-a = db_cash.get_mails()
+# db_cash = TasksCash
+# db_cash.generate_some_tasks()
+# a = db_cash.get_mails()
+
+
 
