@@ -80,6 +80,14 @@ from hidden.tokenfile import OWNER_CHAT_ID
     #     pprint(kvazi_db.rooms_settings)
 
 
+class TimeToMail:
+    """
+    Класс для создания словаря временных рассылок timestamps_for_standard_mailings
+    """
+
+    print(f'{current_datatime()}: Получаем текущую версию timestamps из kvazi_db в переменную')
+    timestamps = kvazi_db.timestamps_for_standard_mailings
+
 class TasksCash:
     """
     Класс для создания буфера БД и работы с ним.
