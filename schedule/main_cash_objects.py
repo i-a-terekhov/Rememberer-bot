@@ -88,6 +88,43 @@ class TimeToMail:
     print(f'{current_datatime()}: Получаем текущую версию timestamps из kvazi_db в переменную')
     timestamps = kvazi_db.timestamps_for_standard_mailings
 
+    @classmethod
+    def check_task(cls, new_time: dict) -> bool:
+        """
+        Функция проверяет входящий словарь на соответствие формату буфера БД
+        """
+        # Эталонная запись
+        # one = {
+        #     '2023-12-10 14:30': [2423452]
+        # }
+
+        if len(new_time) != 1:
+            return False
+
+        for key, value in new_time.items():
+            if not re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$', key):
+                return False
+            elif type(key) != list:
+                return False
+            else:
+                # Неизвестный ключ
+                return False
+        print(f'{current_datatime()}: Проверка пройдена! В буфер БД добавлена новая временная метка.')
+        return True
+
+    @classmethod
+    def save_time(cls, new_time: dict) -> None:
+        """
+        Функция сохраняет в буфер время рассылки
+        """
+        if cls.check_task(new_time):
+            key, value = new_time.items()
+            if key in TimeToMail.timestamps:
+                TimeToMail.timestamps[key].append(value)
+            else:
+                TimeToMail.timestamps[key] = [value]
+
+
 class TasksCash:
     """
     Класс для создания буфера БД и работы с ним.
