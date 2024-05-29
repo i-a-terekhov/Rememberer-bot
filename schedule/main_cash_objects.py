@@ -4,7 +4,7 @@ from random import randint, choice
 
 from aiogram.types import Message
 
-from schedule.time import current_datatime
+from schedule.time import current_datatime, parse_datetime
 from database import kvazi_db
 from hidden.tokenfile import OWNER_CHAT_ID
 
@@ -123,6 +123,21 @@ class TimeToMail:
                 TimeToMail.timestamps[key].append(value)
             else:
                 TimeToMail.timestamps[key] = [value]
+
+    @classmethod
+    def go_throw_timestamps(cls) -> list:
+        """
+        Функция возвращает лист уникальных user_id, для которых пришло время выслать стандартную рассылку
+        """
+        current_dt = parse_datetime(current_datatime())
+        time_is_gone_for_users = []
+        for time_label in cls.timestamps:
+            if current_dt > parse_datetime(time_label):
+                time_is_gone_for_users.extend(cls.timestamps[time_label])
+        time_is_gone_for_users = list(set(time_is_gone_for_users))
+        return time_is_gone_for_users
+
+
 
 
 class TasksCash:
@@ -292,4 +307,5 @@ class TasksCash:
 # a = db_cash.get_mails()
 
 
-
+time_db = TimeToMail
+time_db.go_throw_timestamps()
