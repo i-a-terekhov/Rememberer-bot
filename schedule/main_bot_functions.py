@@ -4,7 +4,7 @@ from pprint import pprint
 from aiogram import Bot
 
 from keyboards.inline import make_inline_rows_keyboard, many_keys_in_row
-from schedule.main_cash_objects import TasksCash
+from schedule.main_cash_objects import TasksCash, TimeToMail
 from schedule.time import current_datatime
 
 
@@ -106,7 +106,11 @@ async def sending_standard_mailings(bot_unit: Bot) -> None:
     """
     Функция отправки стандартной рассылки по времени
     """
-    pass
+    print(f'{current_datatime()}: Рассылка стандартных рассылок (sending_standard_mailings)')
+    time_to_mail = TimeToMail()
+    users_list = time_to_mail.go_throw_timestamps()
+    print(f'Пришло время выслать стандартную рассылку юзерам {users_list}')
+
 
 
 async def periodic_start_for_functions(bot: Bot) -> None:
@@ -115,5 +119,6 @@ async def periodic_start_for_functions(bot: Bot) -> None:
     """
     while True:
         # await sending_all_standard_mailings(bot_unit=bot)
-        await asyncio.sleep(2)
-        await asyncio.sleep(60 * 2)
+        await sending_standard_mailings(bot_unit=bot)
+        await asyncio.sleep(15)
+        # await asyncio.sleep(60 * 2)
