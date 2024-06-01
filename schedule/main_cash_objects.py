@@ -267,9 +267,10 @@ class TasksCash:
             yield cls.all_tasks[task]
 
     @classmethod
-    def get_mails(cls) -> dict:
+    def get_mails(cls, partial_list_of_users: list[str] = None) -> dict:
         """
-        Метод формирует словарь addressee для рассылки сообщений пользователю с группировкой по группам
+        Метод формирует словарь addressee для рассылки сообщений с группировкой по группам для юзеров из users
+        Если лист users не передан - выгружаются все юзеры
         """
 
         # Шаблон словаря для рассылки:
@@ -286,14 +287,15 @@ class TasksCash:
         addressee = {}
         for task_num, task in cls.all_tasks.items():
             executor = task['executor']
-            room = task['room']
-            if room in addressee:
-                if executor not in addressee[room]:
-                    addressee[room][executor] = [task_num]
+            if not partial_list_of_users or executor in partial_list_of_users:
+                room = task['room']
+                if room in addressee:
+                    if executor not in addressee[room]:
+                        addressee[room][executor] = [task_num]
+                    else:
+                        addressee[room][executor].append(task_num)
                 else:
-                    addressee[room][executor].append(task_num)
-            else:
-                addressee[room] = {executor: [task_num]}
+                    addressee[room] = {executor: [task_num]}
         print(f'{current_datatime()}: Сформированный словарь рассылок с группировкой по группам:')
         print('-' * 50)
         pprint(addressee)
