@@ -296,18 +296,6 @@ class TasksCash:
                         addressee[room][executor].append(task_num)
                 else:
                     addressee[room] = {executor: [task_num]}
-        print(f'{current_datatime()}: Сформированный словарь рассылок с группировкой по группам:')
-        print('-' * 50)
-        pprint(addressee)
-        print('-' * 50)
 
         return addressee
 
-
-# db_cash = TasksCash
-# db_cash.generate_some_tasks()
-# a = db_cash.get_mails()
-
-
-time_db = TimeToMail
-time_db.go_throw_timestamps()

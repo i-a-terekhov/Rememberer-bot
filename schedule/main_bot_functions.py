@@ -102,15 +102,21 @@ async def send_menu(bot_unit: Bot, chat_id: str, text: str) -> None:
     )
 
 
-async def sending_standard_mailings(bot_unit: Bot) -> None:
+async def form_dict_for_mailings() -> dict:
     """
-    Функция отправки стандартной рассылки по времени
+    Функция формирования словаря для отправки рассылок
     """
-    print(f'{current_datatime()}: Рассылка стандартных рассылок (sending_standard_mailings)')
+    print(f'{current_datatime()}: Формируем словарь для рассылок (form_dict_for_mailings)')
     time_to_mail = TimeToMail()
     users_list = time_to_mail.go_throw_timestamps()
-    print(f'Пришло время выслать стандартную рассылку юзерам {users_list}')
+    db_cash = TasksCash()
+    mails = db_cash.get_mails(users_list)
 
+    return mails
+
+
+async def send_mailings(bot: Bot, mails: dict) -> None:
+    pass
 
 
 async def periodic_start_for_functions(bot: Bot) -> None:
@@ -118,7 +124,7 @@ async def periodic_start_for_functions(bot: Bot) -> None:
     Функция периодического запуска sending_all_standard_mailings
     """
     while True:
-        # await sending_all_standard_mailings(bot_unit=bot)
-        await sending_standard_mailings(bot_unit=bot)
+        mails = await form_dict_for_mailings()
+        await send_mailings(bot=bot, mails=mails)
         await asyncio.sleep(15)
         # await asyncio.sleep(60 * 2)
