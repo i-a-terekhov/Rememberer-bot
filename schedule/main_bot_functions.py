@@ -3,7 +3,7 @@ from pprint import pprint
 
 from aiogram import Bot
 
-from keyboards.inline import make_inline_rows_keyboard, many_keys_in_row
+from keyboards.inline import make_inline_rows_keyboard, many_keys_in_row, many_keys_in_many_rows
 from schedule.main_cash_objects import TasksCash, TimeToMail
 from schedule.time import current_datatime
 
@@ -59,38 +59,6 @@ def _form_task_message_for_show(task: dict) -> str:
     return text
 
 
-async def sending_for_standard_mailings(bot_unit: Bot) -> None:
-    """
-    Функция отправляет пользователям сообщения с тасками, структурированные по принадлежности к комнатам.
-    """
-    db_cash = TasksCash()
-    # db_cash.generate_some_tasks()  #TODO временная функция для наполнения кэша БД учебными данными
-    mails = db_cash.get_mails()
-    print(f'{current_datatime()}: Обрабатываем задачи из буфера БД (sending_all_standard_mailings)')
-
-    unic_users_with_tasks = []
-    for room in mails:
-        for telegram_id in mails[room]:
-            # print(f'Смотрим получателя {telegram_id}')
-            try:
-                await bot_unit.get_chat(telegram_id)
-                if telegram_id not in unic_users_with_tasks:
-                    unic_users_with_tasks.append(telegram_id)
-            except Exception as e:
-                # print(f"{current_datatime()}: Юзер '{telegram_id}' не найден. Ошибка: {e} (sending_all_standard_mailings)")
-                continue
-            final_text = f'В комнате {room}, есть задачи:\n'
-            for task in mails[room][telegram_id]:
-                final_text += '\n'
-                final_text += _form_task_message_for_show(db_cash.all_tasks[task])
-
-            await send_message_with_bottoms(bot_unit=bot_unit, chat_id=telegram_id, text=final_text)
-
-    menu_text = 'Менюшка'
-    for user in unic_users_with_tasks:
-        await send_menu(bot_unit=bot_unit, chat_id=user, text=menu_text)
-
-
 async def send_menu(bot_unit: Bot, chat_id: str, text: str) -> None:
     """
     Функция отправки сообщения с меню
@@ -98,7 +66,11 @@ async def send_menu(bot_unit: Bot, chat_id: str, text: str) -> None:
     await bot_unit.send_message(
         chat_id=chat_id,
         text=text,
-        reply_markup=make_inline_rows_keyboard(['Мои комнаты', 'Мои задачи'])
+        reply_markup=many_keys_in_many_rows([
+            [('Мои комнаты', 'мои_комнаты'), ('Мои задачи', 'мои_задачи')],
+            [('Продвинуть задачу', 'продвинуть задачу')],
+            ]
+        )
     )
 
 
@@ -110,13 +82,39 @@ async def form_dict_for_mailings() -> dict:
     time_to_mail = TimeToMail()
     users_list = time_to_mail.go_throw_timestamps()
     db_cash = TasksCash()
+    db_cash.generate_some_tasks()  # TODO временная функция для наполнения кэша БД учебными данными
     mails = db_cash.get_mails(users_list)
 
     return mails
 
 
 async def send_mailings(bot: Bot, mails: dict) -> None:
-    pass
+    """
+    Функция отправки стандартной рассылки в чаты по словарю
+    """
+    print(f'{current_datatime()}: Отправляем в чаты рассылку (send_mailings)')
+
+    db_cash = TasksCash()
+    unic_users_with_tasks = []
+    for room in mails:
+        for telegram_id in mails[room]:
+            try:
+                await bot.get_chat(telegram_id)
+                if telegram_id not in unic_users_with_tasks:
+                    unic_users_with_tasks.append(telegram_id)
+            except Exception as e:
+                # print(f"{current_datatime()}: Юзер '{telegram_id}' не найден. Ошибка: {e} (send_mailings)")
+                continue
+            final_text = f'В комнате {room}, есть задачи:\n'
+            for task in mails[room][telegram_id]:
+                final_text += '\n'
+                final_text += _form_task_message_for_show(db_cash.all_tasks[task])
+
+            await bot.send_message(chat_id=telegram_id, text=final_text)
+
+    menu_text = 'Вы можете посмотреть состояние своих комнат или сделать другие действия'
+    for user in unic_users_with_tasks:
+        await send_menu(bot_unit=bot, chat_id=user, text=menu_text)
 
 
 async def periodic_start_for_functions(bot: Bot) -> None:

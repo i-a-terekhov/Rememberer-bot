@@ -214,7 +214,7 @@ class TasksCash:
             else:
                 # Неизвестный ключ
                 return False
-        print(f'{current_datatime()}: Проверка пройдена! В буфер БД добавлена новая задача.')
+        # print(f'{current_datatime()}: Проверка пройдена! В буфер БД добавлена новая задача.')
         return True
 
     @classmethod

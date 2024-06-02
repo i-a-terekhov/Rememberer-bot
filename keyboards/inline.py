@@ -24,6 +24,23 @@ def many_keys_in_row(buttons: list[tuple]) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[keyboard_buttons])
 
 
+def many_keys_in_many_rows(buttons: list[list[tuple]]) -> InlineKeyboardMarkup:
+    """
+    Создаёт инлайн-клавиатуру с одной или несколькими кнопками в один или несколько рядов
+    :param buttons: список списков с кортежами вида (текст кнопки, текст каллбека)
+    :return: объект реплай-клавиатуры
+    """
+    keyboard = []
+    for row in buttons:
+        keyboard_row = []
+        # keyboard_buttons = []
+        for text, callback_data in row:
+            # keyboard_buttons.append(InlineKeyboardButton(text=text, callback_data=callback_data))
+            keyboard_row.append(InlineKeyboardButton(text=text, callback_data=callback_data))
+        keyboard.append(keyboard_row)
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+
 def make_inline_rows_keyboard(items: list[str]) -> InlineKeyboardMarkup:
     """
     Создаёт инлайн-клавиатуру с кнопками в несколько рядов по числу кнопок
