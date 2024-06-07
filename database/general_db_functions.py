@@ -161,8 +161,8 @@ def v_look_up_many(
     return [result[0] for result in results] if results else []
 
 
-con = open_connection(table_name='mini_table', name_of_columns=('one', 'two'))
-
-display_all_data_from_table(table_name='mini_table')
-
-close_connection(connect=con)
+# con = open_connection(table_name='mini_table', name_of_columns=('one', 'two'))
+#
+# display_all_data_from_table(table_name='mini_table')
+#
+# close_connection(connect=con)

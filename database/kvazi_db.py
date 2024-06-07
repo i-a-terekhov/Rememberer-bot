@@ -1,4 +1,5 @@
 from pprint import pprint
+from general_db_functions import open_connection, update_data_in_column, display_all_data_from_table
 
 from hidden.tokenfile import OWNER_CHAT_ID
 
@@ -43,6 +44,15 @@ timestamps_for_standard_mailings = {
     '2023.11.06 14:35': [231423, 231425],
     '2023.12.10 14:15': [231423, 231425],
 }
+
+open_connection(table_name='timestamps', name_of_columns=('time', 'user'))
+# TODO функция обновления, внезапно, не добавляет значения! Нужна функция добавления
+update_data_in_column(
+    table_name='timestamps', base_column_name='time', base_column_value='2023.12.10 14:15',
+    target_column_name='user', new_value='231423'
+)
+display_all_data_from_table(table_name='timestamps')
+
 
 # Словарь в all_tasks в будущем будет формироваться путем запроса к БД, с этим же словарем будет работать
 # класс TasksCash.
