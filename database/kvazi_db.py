@@ -1,5 +1,5 @@
 from pprint import pprint
-from general_db_functions import open_connection, update_data_in_column, display_all_data_from_table
+from general_db_functions import open_connection, update_data_in_column, display_all_data_from_table, add_data_to_table
 
 from hidden.tokenfile import OWNER_CHAT_ID
 
@@ -46,10 +46,11 @@ timestamps_for_standard_mailings = {
 }
 
 open_connection(table_name='timestamps', name_of_columns=('time', 'user'))
-# TODO функция обновления, внезапно, не добавляет значения! Нужна функция добавления
+add_data_to_table(table_name='timestamps', column_names=['time', 'user'], values=['2023.12.10 14:16', '231426'])
+display_all_data_from_table(table_name='timestamps')
 update_data_in_column(
-    table_name='timestamps', base_column_name='time', base_column_value='2023.12.10 14:15',
-    target_column_name='user', new_value='231423'
+    table_name='timestamps', base_column_name='time', base_column_value='2023.12.10 14:16',
+    target_column_name='user', new_value='231424'
 )
 display_all_data_from_table(table_name='timestamps')
 

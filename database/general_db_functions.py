@@ -97,6 +97,26 @@ def display_all_data_from_table(table_name: str) -> None:
     connect.close()
 
 
+def add_data_to_table(table_name: str, column_names: list, values: list) -> None:
+    """
+    Функция добавляет новую строку в таблицу с заданными значениями столбцов.
+    """
+
+    if len(column_names) != len(values):
+        raise ValueError("Количество имен столбцов и значений должно совпадать.")
+
+    connect = open_database()
+    cursor = connect.cursor()
+
+    columns = ", ".join(column_names)
+    placeholders = ", ".join(["?"] * len(values))
+    insert_query = f'INSERT INTO {table_name} ({columns}) VALUES ({placeholders})'
+    cursor.execute(insert_query, values)
+    print(f"Добавлена новая строка в таблицу '{table_name}' с данными: {dict(zip(column_names, values))}")
+
+    close_connection(connect=connect)
+
+
 def update_data_in_column(
         table_name: str, base_column_name: str, base_column_value: str, target_column_name: str, new_value: str
 ) -> None:
