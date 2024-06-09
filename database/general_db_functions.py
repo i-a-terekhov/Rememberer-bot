@@ -2,10 +2,10 @@ import sqlite3
 from sqlite3 import Connection, Error
 from typing import Tuple
 
-DATABASE_REG_NAME = 'probe.sql'
+DATABASE_NAME = 'probe.sql'
 
 
-def open_database(db_name: str = DATABASE_REG_NAME) -> Connection:
+def open_database(db_name: str = DATABASE_NAME) -> Connection:
     """Функция создает коннект к базе данных"""
 
     # Открываем или создаем базу данных
@@ -17,7 +17,7 @@ def open_database(db_name: str = DATABASE_REG_NAME) -> Connection:
         raise sqlite3.OperationalError(f"Не удалось открыть файл базы данных: {e}")
 
 
-def open_connection(table_name: str, name_of_columns: Tuple[str, ...], db_name: str = DATABASE_REG_NAME) -> Connection:
+def open_connection(table_name: str, name_of_columns: Tuple[str, ...], db_name: str = DATABASE_NAME) -> Connection:
     """Функция открывает (или создает при отсутствии) таблицу с заданными столбцами"""
 
     # Открываем или создаем базу данных
@@ -97,7 +97,7 @@ def display_all_data_from_table(table_name: str) -> None:
     connect.close()
 
 
-def add_data_to_table(table_name: str, column_names: list, values: list) -> None:
+def add_data_to_table(table_name: str, column_names: Tuple[str, ...], values: list[str, ...]) -> None:
     """
     Функция добавляет новую строку в таблицу с заданными значениями столбцов.
     """
@@ -115,6 +115,45 @@ def add_data_to_table(table_name: str, column_names: list, values: list) -> None
     print(f"Добавлена новая строка в таблицу '{table_name}' с данными: {dict(zip(column_names, values))}")
 
     close_connection(connect=connect)
+
+
+# def add_data_to_table(table_name: str, column_names: list, values: list) -> None:
+#     """
+#     Функция добавляет новую строку в таблицу с заданными значениями столбцов или обновляет существующую строку,
+#     добавляя новые значения в целевой столбец через запятую.
+#     """
+#
+#     if len(column_names) != len(values):
+#         raise ValueError("Количество имен столбцов и значений должно совпадать.")
+#
+#     connect = open_database()
+#     cursor = connect.cursor()
+#
+#     base_column_name = column_names[0]
+#     base_column_value = values[0]
+#     target_column_name = column_names[1]
+#     new_value = values[1]
+#
+#     # Проверяем, существует ли запись с заданным base_column_value
+#     select_query = f'SELECT {target_column_name} FROM {table_name} WHERE {base_column_name} = ?'
+#     cursor.execute(select_query, (base_column_value,))
+#     row = cursor.fetchone()
+#
+#     if row:
+#         # Если запись существует, обновляем целевой столбец
+#         current_values = row[0] if row[0] else ''
+#         updated_values = f"{current_values},{new_value}" if current_values else new_value
+#         update_query = f'UPDATE {table_name} SET {target_column_name} = ? WHERE {base_column_name} = ?'
+#         cursor.execute(update_query, (updated_values, base_column_value))
+#         print(f"Обновлено значение в столбце '{target_column_name}' для '{base_column_name}' = '{base_column_value}'")
+#     else:
+#         # Если записи не существует, вставляем новую строку
+#         insert_query = f'INSERT INTO {table_name} ({base_column_name}, {target_column_name}) VALUES (?, ?)'
+#         cursor.execute(insert_query, (base_column_value, new_value))
+#         print(
+#             f"Добавлена новая строка: {base_column_name} = '{base_column_value}', {target_column_name} = '{new_value}'")
+#
+#     close_connection(connect=connect)
 
 
 def update_data_in_column(
@@ -182,7 +221,5 @@ def v_look_up_many(
 
 
 # con = open_connection(table_name='mini_table', name_of_columns=('one', 'two'))
-#
+# add_data_to_table(table_name='mini_table', column_names=['one', 'two'], values=['Петя', '3'])
 # display_all_data_from_table(table_name='mini_table')
-#
-# close_connection(connect=con)
