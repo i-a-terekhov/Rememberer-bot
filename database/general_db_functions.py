@@ -2,7 +2,7 @@ import sqlite3
 from sqlite3 import Connection, Error
 from typing import Tuple
 
-DATABASE_NAME = 'probe.sql'
+DATABASE_NAME = 'bot_database.sql'
 
 
 def open_database(db_name: str = DATABASE_NAME) -> Connection:
